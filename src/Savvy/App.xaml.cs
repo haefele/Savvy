@@ -1,31 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
 using Caliburn.Micro;
 using Savvy.Services.DropboxAuthentication;
 using Savvy.Services.Settings;
+using Savvy.Views.AddTransaction;
 using Savvy.Views.Shell;
 using Savvy.Views.Shell.States;
 using Savvy.Views.Welcome;
 
 namespace Savvy
 {
-    /// <summary>
-    /// Provides application-specific behavior to supplement the default Application class.
-    /// </summary>
     public sealed partial class App : CaliburnApplication
     {
         private WinRTContainer _container;
@@ -52,17 +38,21 @@ namespace Savvy
             this._container.RegisterWinRTServices();
 
             //ViewModels
-            this._container.PerRequest<ShellViewModel>();
-            this._container.PerRequest<WelcomeViewModel>();
+            this._container
+                .PerRequest<ShellViewModel>()
+                .PerRequest<WelcomeViewModel>()
+                .PerRequest<AddTransactionViewModel>();
 
             //ShellStates
             this._container
                 .PerRequest<LoggedOutShellState>()
-                .PerRequest<LoggedInShellState>();
+                .PerRequest<LoggedInShellState>()
+                .PerRequest<OpenBudgetShellState>();
 
             //Services
-            this._container.Singleton<ISettings, InMemorySettings>();
-            this._container.Singleton<IDropboxAuthenticationService, DropboxAuthenticationService>();
+            this._container
+                .Singleton<ISettings, InMemorySettings>()
+                .Singleton<IDropboxAuthenticationService, DropboxAuthenticationService>();
         }
 
         protected override object GetInstance(Type service, string key)
@@ -74,7 +64,12 @@ namespace Savvy
         {
             return this._container.GetAllInstances(service);
         }
-        
+
+        protected override void BuildUp(object instance)
+        {
+            this._container.BuildUp(instance);
+        }
+
         protected override void OnLaunched(LaunchActivatedEventArgs args)
         {
             this.Initialize();

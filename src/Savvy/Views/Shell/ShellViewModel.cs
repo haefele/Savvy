@@ -16,7 +16,7 @@ namespace Savvy.Views.Shell
         private ShellState _currentState;
 
         public BindableCollection<NavigationItemViewModel> Actions { get; }
-        public BindableCollection<NavigationItemViewModel> BottomActions { get; }
+        public BindableCollection<NavigationItemViewModel> SecondaryActions { get; }
 
         public ShellState CurrentState
         {
@@ -39,7 +39,7 @@ namespace Savvy.Views.Shell
             this._navigationService = navigationService;
 
             this.Actions = new BindableCollection<NavigationItemViewModel>();
-            this.BottomActions = new BindableCollection<NavigationItemViewModel>();
+            this.SecondaryActions = new BindableCollection<NavigationItemViewModel>();
         }
         
         protected override void OnActivate()

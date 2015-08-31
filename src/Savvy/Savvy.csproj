@@ -101,14 +101,20 @@
       <DependentUpon>Header.xaml</DependentUpon>
     </Compile>
     <Compile Include="Extensions\PropertyChangedBaseExtensions.cs" />
+    <Compile Include="Extensions\YnabApiExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\DropboxAuthentication\DropboxAuthenticationService.cs" />
     <Compile Include="Services\DropboxAuthentication\IDropboxAuthenticationService.cs" />
     <Compile Include="Services\Settings\InMemorySettings.cs" />
     <Compile Include="Services\Settings\ISettings.cs" />
+    <Compile Include="Views\AddTransaction\AddTransactionView.xaml.cs">
+      <DependentUpon>AddTransactionView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\AddTransaction\AddTransactionViewModel.cs" />
     <Compile Include="Views\Shell\States\LoggedInShellState.cs" />
     <Compile Include="Views\Shell\States\LoggedOutShellState.cs" />
     <Compile Include="Views\Shell\NavigationItemViewModel.cs" />
+    <Compile Include="Views\Shell\States\OpenBudgetShellState.cs" />
     <Compile Include="Views\Shell\States\ShellState.cs" />
     <Compile Include="Views\Shell\ShellView.xaml.cs">
       <DependentUpon>ShellView.xaml</DependentUpon>
@@ -146,6 +152,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\AddTransaction\AddTransactionView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\Shell\ShellView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -157,7 +167,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Common\" />
-    <Folder Include="Views\AddTransaction\" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

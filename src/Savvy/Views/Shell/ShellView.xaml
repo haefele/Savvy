@@ -38,7 +38,7 @@
                 </ListView>
                 
                 <ListView Grid.Row="1"
-                          ItemsSource="{Binding BottomActions}" 
+                          ItemsSource="{Binding SecondaryActions}" 
                           SelectionMode="None"
                           ItemClick="ListViewBase_OnItemClick"
                           IsItemClickEnabled="True"
