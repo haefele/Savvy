@@ -1,0 +1,32 @@
+﻿<UserControl
+    x:Class="Savvy.Controls.Header"
+    
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Savvy.Controls"
+    
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    
+    Height="48"
+    >
+
+    <Grid>
+        <RelativePanel Grid.Row="0"
+                       Background="Gray">
+            <Button x:Name="NavigationButton"
+                    Click="NavigationButtonOnClick" 
+                    Content="&#xE700;" 
+                    FontSize="20"
+                    Width="48"
+                    Height="48"
+                    FontFamily="{ThemeResource SymbolThemeFontFamily}"/>
+            <TextBlock RelativePanel.AlignVerticalCenterWith="NavigationButton"
+                       RelativePanel.RightOf="NavigationButton"
+                       Margin="20, 0, 0, 0"
+                       Text="{x:Bind Title}"
+                       Style="{StaticResource TitleTextBlockStyle}" />
+        </RelativePanel>
+    </Grid>
+</UserControl>
