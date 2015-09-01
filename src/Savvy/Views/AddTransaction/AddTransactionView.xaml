@@ -4,19 +4,75 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Savvy.Views.AddTransaction"
+    xmlns:micro="using:Caliburn.Micro"
     
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:converter="using:Savvy.Converter"
     mc:Ignorable="d"
     
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     >
+    <Page.Resources>
+        <converter:BooleanToObjectConverter x:Key="BoolToInflowOutflowConverter"
+                                            TrueValue="Outflow"
+                                            FalseValue="Inflow" />
+    </Page.Resources>
+    <Grid>
 
-    <Grid Padding="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
 
-        <ComboBox ItemsSource="{Binding Payees}" 
-                  Header="Payee"
-                  HorizontalAlignment="Stretch" />
+        <StackPanel Grid.Row="0"
+                    Padding="10">
+
+            <ComboBox x:Name="AccountsComboBox"
+                      ItemsSource="{Binding Accounts}" 
+                      SelectedItem="{Binding SelectedAccount, Mode=TwoWay}"
+                      Header="Account"
+                      HorizontalAlignment="Stretch"
+                      />
+
+            <ComboBox x:Name="CategoriesComboBox"
+                      ItemsSource="{Binding Categories}" 
+                      SelectedItem="{Binding SelectedCategory, Mode=TwoWay}"
+                      Header="Category"
+                      HorizontalAlignment="Stretch"
+                      />
+            
+            <ComboBox x:Name="PayeesComboBox"
+                      ItemsSource="{Binding Payees}" 
+                      SelectedItem="{Binding SelectedPayee, Mode=TwoWay}"
+                      Header="Payee" 
+                      HorizontalAlignment="Stretch"
+                      />
+
+            <ToggleButton Content="{Binding IsOutflow, Converter={StaticResource BoolToInflowOutflowConverter}}" 
+                          Margin="0, 10, 0, 0"
+                          HorizontalAlignment="Stretch"
+                          IsChecked="{Binding IsOutflow, Mode=TwoWay}"
+                          />
+
+            <TextBox x:Name="AmountTextBox"
+                     Text="{Binding Amount, Mode=TwoWay}"
+                     Header="Amount" 
+                     InputScope="NumberFullWidth" 
+                     />
+            
+            <TextBox x:Name="MemoTextBox"
+                     Text="{Binding Memo, Mode=TwoWay}"
+                     Header="Memo"
+                     />
+        </StackPanel>
+
+        <CommandBar Grid.Row ="1">
+            <AppBarButton Icon="Save"
+                          Label="Save transaction"
+                          micro:Message.Attach="Save"
+                          />
+        </CommandBar>
         
     </Grid>
 </Page>

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using Windows.UI.Xaml.Controls;
 using Caliburn.Micro;
 using YnabApi;
@@ -14,6 +15,8 @@ namespace Savvy.Views.Shell.States
 
         private readonly NavigationItemViewModel _logoutItem;
 
+        private IList<NavigationItemViewModel> _budgetItems;
+            
         [Required]
         public string AccessCode { get; set; }
 
@@ -34,10 +37,11 @@ namespace Savvy.Views.Shell.States
 
             IList<Budget> budgets = await api.GetBudgetsAsync();
 
-            foreach (var budget in budgets)
-            {
-                this.ViewModel.Actions.Add(new NavigationItemViewModel(() => this.OpenBudget(budget)) { Label = budget.BudgetName, Symbol = Symbol.Account });
-            }
+            this._budgetItems = budgets
+                .Select(f => new NavigationItemViewModel(() => this.OpenBudget(f)) {Label = f.BudgetName, Symbol = Symbol.Account})
+                .ToList();
+
+            this.ViewModel.Actions.AddRange(this._budgetItems);
         }
 
         private void OpenBudget(Budget budget)
@@ -53,7 +57,11 @@ namespace Savvy.Views.Shell.States
         {
             this._container.UnregisterHandler(typeof(YnabApi.YnabApi), null);
             this.ViewModel.SecondaryActions.Remove(this._logoutItem);
-            this.ViewModel.Actions.Clear();
+
+            foreach (var budgetItem in this._budgetItems)
+            {
+                this.ViewModel.Actions.Remove(budgetItem);
+            }
         }
 
         private void Logout()

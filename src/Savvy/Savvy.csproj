@@ -100,6 +100,7 @@
     <Compile Include="Controls\Header.xaml.cs">
       <DependentUpon>Header.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Converter\BooleanToObjectConverter.cs" />
     <Compile Include="Extensions\PropertyChangedBaseExtensions.cs" />
     <Compile Include="Extensions\YnabApiExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -111,6 +112,10 @@
       <DependentUpon>AddTransactionView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\AddTransaction\AddTransactionViewModel.cs" />
+    <Compile Include="Views\BudgetOverview\BudgetOverviewView.xaml.cs">
+      <DependentUpon>BudgetOverviewView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\BudgetOverview\BudgetOverviewViewModel.cs" />
     <Compile Include="Views\Shell\States\LoggedInShellState.cs" />
     <Compile Include="Views\Shell\States\LoggedOutShellState.cs" />
     <Compile Include="Views\Shell\NavigationItemViewModel.cs" />
@@ -153,6 +158,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\AddTransaction\AddTransactionView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\BudgetOverview\BudgetOverviewView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

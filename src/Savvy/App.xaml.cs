@@ -39,7 +39,7 @@ namespace Savvy
 
             //ViewModels
             this._container
-                .PerRequest<ShellViewModel>()
+                .Singleton<ShellViewModel>()
                 .PerRequest<WelcomeViewModel>()
                 .PerRequest<AddTransactionViewModel>();
 
