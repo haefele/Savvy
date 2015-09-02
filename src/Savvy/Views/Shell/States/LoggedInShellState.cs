@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Windows.UI.Xaml.Controls;
 using Caliburn.Micro;
+using Savvy.Extensions;
 using YnabApi;
 using YnabApi.Dropbox;
 
@@ -30,8 +31,7 @@ namespace Savvy.Views.Shell.States
 
         public override async void Enter()
         {
-            var api = new YnabApi.YnabApi(new DropboxFileSystem(this.AccessCode));
-            this._container.Instance(api);
+            var api = this._container.RegisterYnabApi(this.AccessCode);
             
             this.ViewModel.SecondaryActions.Add(this._logoutItem);
 
@@ -44,6 +44,18 @@ namespace Savvy.Views.Shell.States
             this.ViewModel.Actions.AddRange(this._budgetItems);
         }
 
+        public override void Leave()
+        {
+            this._container.UnregisterYnabApi();
+
+            this.ViewModel.SecondaryActions.Remove(this._logoutItem);
+
+            foreach (var budgetItem in this._budgetItems)
+            {
+                this.ViewModel.Actions.Remove(budgetItem);
+            }
+        }
+        
         private void OpenBudget(Budget budget)
         {
             var newState = IoC.Get<OpenBudgetShellState>();
@@ -51,17 +63,6 @@ namespace Savvy.Views.Shell.States
             newState.BudgetName = budget.BudgetName;
 
             this.ViewModel.CurrentState = newState;
-        }
-
-        public override void Leave()
-        {
-            this._container.UnregisterHandler(typeof(YnabApi.YnabApi), null);
-            this.ViewModel.SecondaryActions.Remove(this._logoutItem);
-
-            foreach (var budgetItem in this._budgetItems)
-            {
-                this.ViewModel.Actions.Remove(budgetItem);
-            }
         }
 
         private void Logout()

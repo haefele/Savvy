@@ -101,6 +101,7 @@
       <DependentUpon>Header.xaml</DependentUpon>
     </Compile>
     <Compile Include="Converter\BooleanToObjectConverter.cs" />
+    <Compile Include="Extensions\WinRTContainerExtensions.cs" />
     <Compile Include="Extensions\PropertyChangedBaseExtensions.cs" />
     <Compile Include="Extensions\YnabApiExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

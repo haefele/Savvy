@@ -86,17 +86,11 @@ namespace Savvy.Views.Shell.States
         
         private async Task RefreshAsync()
         {
-            var newApi = new YnabApi.YnabApi(new DropboxFileSystem(this.AccessCode));
-            var tempBudget = await newApi.GetBudgetAsync(this.BudgetName);
-            var tempDevice = await tempBudget.RegisterDevice(Windows.Networking.Proximity.PeerFinder.DisplayName);
-            
-            this._container.UnregisterHandler(typeof(YnabApi.YnabApi), null);
-            this._container.Instance(new YnabApi.YnabApi(new DropboxFileSystem(this.AccessCode)));
+            this._container.UnregisterYnabApi();
 
-            this._budget = tempBudget;
-            this._device = tempDevice;
-
-            this._overviewItem.Label = $"{this._budget.BudgetName} overview";
+            var api = this._container.RegisterYnabApi(this.AccessCode);
+            this._budget = await api.GetBudgetAsync(this.BudgetName);
+            this._device = await this._budget.RegisterDevice(Windows.Networking.Proximity.PeerFinder.DisplayName);
         }
 
         private void Logout()

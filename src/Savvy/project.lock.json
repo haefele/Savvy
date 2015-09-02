@@ -1595,7 +1595,7 @@
           "lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "YnabApi/0.9.33": {
+      "YnabApi/0.10.1": {
         "dependencies": {
           "Newtonsoft.Json": "[7.0.1, )"
         },
@@ -1606,9 +1606,9 @@
           "lib/portable-net45+netcore45+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10/YnabApi.dll": {}
         }
       },
-      "YnabApi.Dropbox/0.9.33": {
+      "YnabApi.Dropbox/0.10.1": {
         "dependencies": {
-          "YnabApi": "[0.9.33, )"
+          "YnabApi": "[0.10.1, )"
         },
         "compile": {
           "lib/portable-net45+netcore45+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10/YnabApi.Dropbox.dll": {}
@@ -3301,7 +3301,7 @@
           "lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "YnabApi/0.9.33": {
+      "YnabApi/0.10.1": {
         "dependencies": {
           "Newtonsoft.Json": "[7.0.1, )"
         },
@@ -3312,9 +3312,9 @@
           "lib/portable-net45+netcore45+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10/YnabApi.dll": {}
         }
       },
-      "YnabApi.Dropbox/0.9.33": {
+      "YnabApi.Dropbox/0.10.1": {
         "dependencies": {
-          "YnabApi": "[0.9.33, )"
+          "YnabApi": "[0.10.1, )"
         },
         "compile": {
           "lib/portable-net45+netcore45+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10/YnabApi.Dropbox.dll": {}
@@ -4979,7 +4979,7 @@
           "runtimes/win8-aot/lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "YnabApi/0.9.33": {
+      "YnabApi/0.10.1": {
         "dependencies": {
           "Newtonsoft.Json": "[7.0.1, )"
         },
@@ -4990,9 +4990,9 @@
           "lib/portable-net45+netcore45+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10/YnabApi.dll": {}
         }
       },
-      "YnabApi.Dropbox/0.9.33": {
+      "YnabApi.Dropbox/0.10.1": {
         "dependencies": {
-          "YnabApi": "[0.9.33, )"
+          "YnabApi": "[0.10.1, )"
         },
         "compile": {
           "lib/portable-net45+netcore45+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10/YnabApi.Dropbox.dll": {}
@@ -6690,7 +6690,7 @@
           "lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "YnabApi/0.9.33": {
+      "YnabApi/0.10.1": {
         "dependencies": {
           "Newtonsoft.Json": "[7.0.1, )"
         },
@@ -6701,9 +6701,9 @@
           "lib/portable-net45+netcore45+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10/YnabApi.dll": {}
         }
       },
-      "YnabApi.Dropbox/0.9.33": {
+      "YnabApi.Dropbox/0.10.1": {
         "dependencies": {
-          "YnabApi": "[0.9.33, )"
+          "YnabApi": "[0.10.1, )"
         },
         "compile": {
           "lib/portable-net45+netcore45+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10/YnabApi.Dropbox.dll": {}
@@ -8368,7 +8368,7 @@
           "runtimes/win8-aot/lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "YnabApi/0.9.33": {
+      "YnabApi/0.10.1": {
         "dependencies": {
           "Newtonsoft.Json": "[7.0.1, )"
         },
@@ -8379,9 +8379,9 @@
           "lib/portable-net45+netcore45+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10/YnabApi.dll": {}
         }
       },
-      "YnabApi.Dropbox/0.9.33": {
+      "YnabApi.Dropbox/0.10.1": {
         "dependencies": {
-          "YnabApi": "[0.9.33, )"
+          "YnabApi": "[0.10.1, )"
         },
         "compile": {
           "lib/portable-net45+netcore45+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10/YnabApi.Dropbox.dll": {}
@@ -10079,7 +10079,7 @@
           "lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "YnabApi/0.9.33": {
+      "YnabApi/0.10.1": {
         "dependencies": {
           "Newtonsoft.Json": "[7.0.1, )"
         },
@@ -10090,9 +10090,9 @@
           "lib/portable-net45+netcore45+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10/YnabApi.dll": {}
         }
       },
-      "YnabApi.Dropbox/0.9.33": {
+      "YnabApi.Dropbox/0.10.1": {
         "dependencies": {
-          "YnabApi": "[0.9.33, )"
+          "YnabApi": "[0.10.1, )"
         },
         "compile": {
           "lib/portable-net45+netcore45+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10/YnabApi.Dropbox.dll": {}
@@ -11757,7 +11757,7 @@
           "runtimes/win8-aot/lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "YnabApi/0.9.33": {
+      "YnabApi/0.10.1": {
         "dependencies": {
           "Newtonsoft.Json": "[7.0.1, )"
         },
@@ -11768,9 +11768,9 @@
           "lib/portable-net45+netcore45+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10/YnabApi.dll": {}
         }
       },
-      "YnabApi.Dropbox/0.9.33": {
+      "YnabApi.Dropbox/0.10.1": {
         "dependencies": {
-          "YnabApi": "[0.9.33, )"
+          "YnabApi": "[0.10.1, )"
         },
         "compile": {
           "lib/portable-net45+netcore45+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10/YnabApi.Dropbox.dll": {}
@@ -15411,25 +15411,25 @@
         "[Content_Types].xml"
       ]
     },
-    "YnabApi/0.9.33": {
-      "sha512": "ChdJZVCUFPYwIcOlJeq7Or0RX4OHNNySg+XWcEqgOXtpKlTiEOH+s2Fe4wKkqcFWiEpVdscIAKwqZBXG4/DAMg==",
+    "YnabApi/0.10.1": {
+      "sha512": "0OFaZ7LRo02OU9Q9DGUj/7tmOvE+dmXAzHsiFWUYSvYioDErhbga6W1gnTkqTaxRqVUtwnsdSDvkQux4ZKLt8Q==",
       "type": "Package",
       "files": [
         "_rels/.rels",
         "YnabApi.nuspec",
         "lib/portable-net45+netcore45+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10/YnabApi.dll",
-        "package/services/metadata/core-properties/ea4c03cfe30e43bd8017d313cb0bf766.psmdcp",
+        "package/services/metadata/core-properties/2a445bd34bcb4f49887cac68ae98ecd6.psmdcp",
         "[Content_Types].xml"
       ]
     },
-    "YnabApi.Dropbox/0.9.33": {
-      "sha512": "CIa3wPCC/OmlgtNt5DObz3SwGrndlKTu69u3tk4nVFIe6l0TiB5FOT3zPLMXAgZ/7wkOQMYFl9la+ZqUex+jXA==",
+    "YnabApi.Dropbox/0.10.1": {
+      "sha512": "WUtE/kf8Sxmemi6dkIeKbxxqiaAyqgt5ZcL4GF1wP7npC/XIQJVbgOPOGShF5mW/egzRutHzhQPTVAEIFEYMsw==",
       "type": "Package",
       "files": [
         "_rels/.rels",
         "YnabApi.Dropbox.nuspec",
         "lib/portable-net45+netcore45+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10/YnabApi.Dropbox.dll",
-        "package/services/metadata/core-properties/95e57bdb8eb249d6980a8652a78e3e08.psmdcp",
+        "package/services/metadata/core-properties/66eb377e60a040e9bea54d8ae2fffb67.psmdcp",
         "[Content_Types].xml"
       ]
     }
@@ -15439,7 +15439,7 @@
       "Caliburn.Micro >= 3.0.0-beta1",
       "Microsoft.Net.Http >= 2.2.29",
       "Microsoft.NETCore.UniversalWindowsPlatform >= 5.0.0",
-      "YnabApi.Dropbox >= 0.9.33"
+      "YnabApi.Dropbox >= 0.10.1"
     ],
     "UAP,Version=v10.0": []
   }
