@@ -83,14 +83,17 @@ namespace Savvy.Views.AddTransaction
 
         protected override async void OnInitialize()
         {
-            this._budget = await this._api.GetBudgetAsync(this.BudgetName);
-            this._device = await this._budget.GetRegisteredDevice(this.DeviceGuid);
+            using (this._loadingService.Show("Loading data..."))
+            {
+                this._budget = await this._api.GetBudgetAsync(this.BudgetName);
+                this._device = await this._budget.GetRegisteredDevice(this.DeviceGuid);
 
-            var fullKnowledgeDevice = await this._budget.GetFullKnowledgeDevice();
+                var fullKnowledgeDevice = await this._budget.GetFullKnowledgeDevice();
 
-            this.Payees.AddRange(await fullKnowledgeDevice.GetPayeesAsync());
-            this.Accounts.AddRange(await fullKnowledgeDevice.GetAccountsAsync());
-            this.Categories.AddRange(await fullKnowledgeDevice.GetCategoriesAsync());
+                this.Payees.AddRange(await fullKnowledgeDevice.GetPayeesAsync());
+                this.Accounts.AddRange(await fullKnowledgeDevice.GetAccountsAsync());
+                this.Categories.AddRange(await fullKnowledgeDevice.GetCategoriesAsync());
+            }
         }
 
         public async void Save()

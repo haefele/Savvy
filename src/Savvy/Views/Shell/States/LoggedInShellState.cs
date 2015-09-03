@@ -4,6 +4,7 @@ using System.Linq;
 using Windows.UI.Xaml.Controls;
 using Caliburn.Micro;
 using Savvy.Extensions;
+using Savvy.Services.Loading;
 using YnabApi;
 using YnabApi.Dropbox;
 
@@ -13,6 +14,7 @@ namespace Savvy.Views.Shell.States
     {
         private readonly WinRTContainer _container;
         private readonly INavigationService _navigationService;
+        private readonly ILoadingService _loadingService;
 
         private readonly NavigationItemViewModel _logoutItem;
 
@@ -21,27 +23,31 @@ namespace Savvy.Views.Shell.States
         [Required]
         public string AccessCode { get; set; }
 
-        public LoggedInShellState(WinRTContainer container, INavigationService navigationService)
+        public LoggedInShellState(WinRTContainer container, INavigationService navigationService, ILoadingService loadingService)
         {
             this._container = container;
             this._navigationService = navigationService;
+            this._loadingService = loadingService;
 
             this._logoutItem = new NavigationItemViewModel(this.Logout) { Label = "Logout", Symbol = Symbol.LeaveChat };
         }
 
         public override async void Enter()
         {
-            var api = this._container.RegisterYnabApi(this.AccessCode);
+            using (this._loadingService.Show("Loading budgets..."))
+            { 
+                var api = this._container.RegisterYnabApi(this.AccessCode);
             
-            this.ViewModel.SecondaryActions.Add(this._logoutItem);
+                this.ViewModel.SecondaryActions.Add(this._logoutItem);
 
-            IList<Budget> budgets = await api.GetBudgetsAsync();
+                IList<Budget> budgets = await api.GetBudgetsAsync();
 
-            this._budgetItems = budgets
-                .Select(f => new NavigationItemViewModel(() => this.OpenBudget(f)) {Label = f.BudgetName, Symbol = Symbol.Account})
-                .ToList();
+                this._budgetItems = budgets
+                    .Select(f => new NavigationItemViewModel(() => this.OpenBudget(f)) {Label = f.BudgetName, Symbol = Symbol.Account})
+                    .ToList();
 
-            this.ViewModel.Actions.AddRange(this._budgetItems);
+                this.ViewModel.Actions.AddRange(this._budgetItems);
+            }
         }
 
         public override void Leave()

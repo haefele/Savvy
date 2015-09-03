@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Windows.UI.Xaml.Controls;
 using Caliburn.Micro;
 using Savvy.Extensions;
+using Savvy.Services.Loading;
 using Savvy.Views.AddTransaction;
 using Savvy.Views.BudgetOverview;
 using YnabApi;
@@ -15,6 +16,7 @@ namespace Savvy.Views.Shell.States
     {
         private readonly WinRTContainer _container;
         private readonly INavigationService _navigationService;
+        private readonly ILoadingService _loadingService;
 
         private readonly NavigationItemViewModel _overviewItem;
         private readonly NavigationItemViewModel _addTransactionItem;
@@ -30,10 +32,11 @@ namespace Savvy.Views.Shell.States
         [Required]
         public string BudgetName { get; set; }
 
-        public OpenBudgetShellState(WinRTContainer container, INavigationService navigationService)
+        public OpenBudgetShellState(WinRTContainer container, INavigationService navigationService, ILoadingService loadingService)
         {
             this._container = container;
             this._navigationService = navigationService;
+            this._loadingService = loadingService;
 
             this._overviewItem = new NavigationItemViewModel(this.Overview) { Label = "Overview", Symbol = Symbol.Globe };
             this._addTransactionItem = new NavigationItemViewModel(this.AddTransaction) { Label = "Add transaction", Symbol = Symbol.Add };
@@ -86,11 +89,14 @@ namespace Savvy.Views.Shell.States
         
         private async Task RefreshAsync()
         {
-            this._container.UnregisterYnabApi();
+            using (this._loadingService.Show("Registering device..."))
+            { 
+                this._container.UnregisterYnabApi();
 
-            var api = this._container.RegisterYnabApi(this.AccessCode);
-            this._budget = await api.GetBudgetAsync(this.BudgetName);
-            this._device = await this._budget.RegisterDevice(Windows.Networking.Proximity.PeerFinder.DisplayName);
+                var api = this._container.RegisterYnabApi(this.AccessCode);
+                this._budget = await api.GetBudgetAsync(this.BudgetName);
+                this._device = await this._budget.RegisterDevice(Windows.Networking.Proximity.PeerFinder.DisplayName);
+            }
         }
 
         private void Logout()
