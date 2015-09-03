@@ -4,6 +4,7 @@ using Windows.ApplicationModel.Activation;
 using Windows.UI.Xaml;
 using Caliburn.Micro;
 using Savvy.Services.DropboxAuthentication;
+using Savvy.Services.Loading;
 using Savvy.Services.Settings;
 using Savvy.Views.AddTransaction;
 using Savvy.Views.Shell;
@@ -76,6 +77,7 @@ namespace Savvy
 
             var view = new ShellView();
             this._container.RegisterNavigationService(view.ContentFrame);
+            this._container.Instance((ILoadingService)new LoadingService(view.LoadingOverlay));
 
             var viewModel = IoC.Get<ShellViewModel>();
             ViewModelBinder.Bind(viewModel, view, null);

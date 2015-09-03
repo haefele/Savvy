@@ -5,6 +5,7 @@ using System.Linq;
 using Windows.Devices.Enumeration;
 using Caliburn.Micro;
 using Savvy.Extensions;
+using Savvy.Services.Loading;
 using Savvy.Views.BudgetOverview;
 using YnabApi;
 using YnabApi.DeviceActions;
@@ -16,6 +17,7 @@ namespace Savvy.Views.AddTransaction
     {
         private readonly YnabApi.YnabApi _api;
         private readonly INavigationService _navigationService;
+        private readonly ILoadingService _loadingService;
 
         private Budget _budget;
         private RegisteredDevice _device;
@@ -66,10 +68,11 @@ namespace Savvy.Views.AddTransaction
             set { this.SetProperty(ref this._memo, value); }
         }
         
-        public AddTransactionViewModel(YnabApi.YnabApi api, INavigationService navigationService)
+        public AddTransactionViewModel(YnabApi.YnabApi api, INavigationService navigationService, ILoadingService loadingService)
         {
             this._api = api;
             this._navigationService = navigationService;
+            this._loadingService = loadingService;
 
             this.Payees = new BindableCollection<Payee>();
             this.Accounts = new BindableCollection<Account>();
@@ -92,24 +95,27 @@ namespace Savvy.Views.AddTransaction
 
         public async void Save()
         {
-            decimal parsedAmount;
+            decimal? parsedAmount = this.Amount.ToDecimal();
 
             if (this.SelectedAccount == null ||
                 this.SelectedCategory == null ||
                 this.SelectedPayee == null ||
-                decimal.TryParse(this.Amount, NumberStyles.Any, CultureInfo.CurrentUICulture, out parsedAmount) == false)
+                parsedAmount == null)
                 return;
 
-            var action = new CreateTransactionDeviceAction
-            {
-                Account = this.SelectedAccount,
-                Category = this.SelectedCategory,
-                Payee = this.SelectedPayee,
-                Amount = this.IsOutflow ? -1 * parsedAmount : parsedAmount,
-                Memo = this.Memo
-            };
+            using (this._loadingService.Show("Saving transaction..."))
+            { 
+                var action = new CreateTransactionDeviceAction
+                {
+                    Account = this.SelectedAccount,
+                    Category = this.SelectedCategory,
+                    Payee = this.SelectedPayee,
+                    Amount = this.IsOutflow ? -1 * parsedAmount.Value : parsedAmount.Value,
+                    Memo = this.Memo
+                };
 
-            await this._device.ExecuteActions(action);
+                await this._device.ExecuteActions(action);
+            }
 
             this._navigationService
                 .For<BudgetOverviewViewModel>()

@@ -7,12 +7,14 @@
     
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:micro="using:Caliburn.Micro"
     mc:Ignorable="d"
     >
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <TextBlock Text="Welcome" 
-                   HorizontalAlignment="Center" 
-                   VerticalAlignment="Center" />
+        <Button micro:Message.Attach="Show"
+                Content="Klick Mich"
+                HorizontalAlignment="Center" 
+                VerticalAlignment="Center" />
     </Grid>
 </Page>
