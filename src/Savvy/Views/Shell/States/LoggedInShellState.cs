@@ -7,6 +7,7 @@ using Caliburn.Micro;
 using Savvy.Extensions;
 using Savvy.Services.DropboxAuthentication;
 using Savvy.Services.Loading;
+using Savvy.Views.AllBudgetsOverview;
 using Savvy.YnabApiFileSystem;
 using YnabApi;
 
@@ -40,6 +41,10 @@ namespace Savvy.Views.Shell.States
         {
             using (this._loadingService.Show("Loading budgets..."))
             {
+                this._navigationService
+                    .For<AllBudgetsOverviewViewModel>()
+                    .Navigate();
+
                 var api = await this._container.RegisterYnabApiAsync(this.Auth);
 
                 await this.RefreshAsync();

@@ -100,6 +100,10 @@
     <Compile Include="Common\DisposableAction.cs" />
     <Compile Include="Extensions\StorageFolderExtensions.cs" />
     <Compile Include="Services\DropboxAuthentication\DropboxAuth.cs" />
+    <Compile Include="Views\AllBudgetsOverview\AllBudgetsOverviewView.xaml.cs">
+      <DependentUpon>AllBudgetsOverviewView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\AllBudgetsOverview\AllBudgetsOverviewViewModel.cs" />
     <Compile Include="YnabApiFileSystem\AccessCodeMessageHandler.cs" />
     <Compile Include="YnabApiFileSystem\DropboxSynchronization.cs" />
     <Compile Include="YnabApiFileSystem\HybridFileSystem.cs" />
@@ -175,6 +179,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\AddTransaction\AddTransactionView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\AllBudgetsOverview\AllBudgetsOverviewView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
