@@ -1,16 +1,23 @@
-﻿using Caliburn.Micro;
+﻿using System;
+using System.Threading.Tasks;
+using Windows.Storage;
+using Caliburn.Micro;
+using Savvy.Services.DropboxAuthentication;
+using Savvy.YnabApiFileSystem;
 using YnabApi;
-using YnabApi.Dropbox;
 
 namespace Savvy.Extensions
 {
     public static class WinRTContainerExtensions
     {
-        public static YnabApi.YnabApi RegisterYnabApi(this WinRTContainer container, string accessCode)
+        public static async Task<YnabApi.YnabApi> RegisterYnabApiAsync(this WinRTContainer container, DropboxAuth auth)
         {
-            var settings = new YnabApiSettings(new DropboxFileSystem(accessCode));
-            var api = new YnabApi.YnabApi(settings);
+            var rootFolder = await ApplicationData.Current.LocalFolder.CreateFolderAsync("Dropbox", CreationCollisionOption.OpenIfExists);
 
+            var fileSystem = new HybridFileSystem(rootFolder, auth);
+            var api = new YnabApi.YnabApi(new YnabApiSettings(fileSystem));
+
+            container.Instance(fileSystem);
             container.Instance(api);
 
             return api;
@@ -18,6 +25,7 @@ namespace Savvy.Extensions
 
         public static void UnregisterYnabApi(this WinRTContainer container)
         {
+            container.UnregisterHandler(typeof(HybridFileSystem), null);
             container.UnregisterHandler(typeof(YnabApi.YnabApi), null);
         }
     }

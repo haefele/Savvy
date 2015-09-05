@@ -98,6 +98,11 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="Common\DisposableAction.cs" />
+    <Compile Include="Extensions\StorageFolderExtensions.cs" />
+    <Compile Include="Services\DropboxAuthentication\DropboxAuth.cs" />
+    <Compile Include="YnabApiFileSystem\AccessCodeMessageHandler.cs" />
+    <Compile Include="YnabApiFileSystem\DropboxSynchronization.cs" />
+    <Compile Include="YnabApiFileSystem\HybridFileSystem.cs" />
     <Compile Include="Controls\Header.xaml.cs">
       <DependentUpon>Header.xaml</DependentUpon>
     </Compile>

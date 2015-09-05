@@ -1,7 +1,11 @@
+using System;
+using System.Diagnostics;
+using Windows.Storage;
 using Windows.UI.Xaml.Controls;
 using Caliburn.Micro;
 using Savvy.Services.DropboxAuthentication;
 using Savvy.Views.Welcome;
+using Savvy.YnabApiFileSystem;
 
 namespace Savvy.Views.Shell.States
 {
@@ -34,13 +38,13 @@ namespace Savvy.Views.Shell.States
 
         private async void Login()
         {
-            var accessCode = await this._dropboxAuthenticationService.LoginAndGetAccessCodeAsync();
+            var auth = await this._dropboxAuthenticationService.LoginAndGetAccessCodeAsync();
 
-            if (string.IsNullOrWhiteSpace(accessCode))
+            if (auth == null)
                 return;
-
+            
             var newState = IoC.Get<LoggedInShellState>();
-            newState.AccessCode = accessCode;
+            newState.Auth = auth;
 
             this.ViewModel.CurrentState = newState;
         }

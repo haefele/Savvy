@@ -1,12 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading.Tasks;
 using Windows.UI.Xaml.Controls;
 using Caliburn.Micro;
 using Savvy.Extensions;
+using Savvy.Services.DropboxAuthentication;
 using Savvy.Services.Loading;
+using Savvy.YnabApiFileSystem;
 using YnabApi;
-using YnabApi.Dropbox;
 
 namespace Savvy.Views.Shell.States
 {
@@ -16,12 +18,13 @@ namespace Savvy.Views.Shell.States
         private readonly INavigationService _navigationService;
         private readonly ILoadingService _loadingService;
 
+        private readonly NavigationItemViewModel _refreshItem;
         private readonly NavigationItemViewModel _logoutItem;
 
         private IList<NavigationItemViewModel> _budgetItems;
-            
+
         [Required]
-        public string AccessCode { get; set; }
+        public DropboxAuth Auth { get; set; }
 
         public LoggedInShellState(WinRTContainer container, INavigationService navigationService, ILoadingService loadingService)
         {
@@ -29,15 +32,18 @@ namespace Savvy.Views.Shell.States
             this._navigationService = navigationService;
             this._loadingService = loadingService;
 
+            this._refreshItem = new NavigationItemViewModel(async () => await this.RefreshAsync()) { Label = "Refresh", Symbol = Symbol.Refresh };
             this._logoutItem = new NavigationItemViewModel(this.Logout) { Label = "Logout", Symbol = Symbol.LeaveChat };
         }
 
         public override async void Enter()
         {
             using (this._loadingService.Show("Loading budgets..."))
-            { 
-                var api = this._container.RegisterYnabApi(this.AccessCode);
-            
+            {
+                var api = await this._container.RegisterYnabApiAsync(this.Auth);
+
+                await this.RefreshAsync();
+
                 this.ViewModel.SecondaryActions.Add(this._logoutItem);
 
                 IList<Budget> budgets = await api.GetBudgetsAsync();
@@ -47,6 +53,7 @@ namespace Savvy.Views.Shell.States
                     .ToList();
 
                 this.ViewModel.Actions.AddRange(this._budgetItems);
+                this.ViewModel.Actions.Add(this._refreshItem);
             }
         }
 
@@ -60,15 +67,25 @@ namespace Savvy.Views.Shell.States
             {
                 this.ViewModel.Actions.Remove(budgetItem);
             }
+            this.ViewModel.Actions.Remove(this._refreshItem);
         }
         
         private void OpenBudget(Budget budget)
         {
             var newState = IoC.Get<OpenBudgetShellState>();
-            newState.AccessCode = this.AccessCode;
+            newState.Auth = this.Auth;
             newState.BudgetName = budget.BudgetName;
 
             this.ViewModel.CurrentState = newState;
+        }
+
+        private async Task RefreshAsync()
+        {
+            using (this._loadingService.Show("Refreshing..."))
+            {
+                var fileSystem = this._container.GetInstance<HybridFileSystem>();
+                await fileSystem.Synchronization.RefreshLocalStateAsync();
+            }
         }
 
         private void Logout()

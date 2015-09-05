@@ -5,6 +5,6 @@ namespace Savvy.Services.DropboxAuthentication
 {
     public interface IDropboxAuthenticationService
     {
-        Task<string> LoginAndGetAccessCodeAsync();
+        Task<DropboxAuth> LoginAndGetAccessCodeAsync();
     }
 }

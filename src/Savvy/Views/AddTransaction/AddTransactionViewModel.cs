@@ -92,7 +92,7 @@ namespace Savvy.Views.AddTransaction
 
                 this.Payees.AddRange(await fullKnowledgeDevice.GetPayeesAsync());
                 this.Accounts.AddRange(await fullKnowledgeDevice.GetAccountsAsync());
-                this.Categories.AddRange(await fullKnowledgeDevice.GetCategoriesAsync());
+                this.Categories.AddRange(await fullKnowledgeDevice.GetActiveCategoriesAsync());
             }
         }
 

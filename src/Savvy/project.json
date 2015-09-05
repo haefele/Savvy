@@ -3,7 +3,8 @@
     "Caliburn.Micro": "3.0.0-beta1",
     "Microsoft.Net.Http": "2.2.29",
     "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
-    "YnabApi.Dropbox": "0.10.1"
+    "Newtonsoft.Json": "7.0.1",
+    "YnabApi": "0.10.4"
   },
   "frameworks": {
     "uap10.0": {}

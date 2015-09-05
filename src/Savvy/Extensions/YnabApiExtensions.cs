@@ -1,6 +1,9 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using YnabApi;
+using YnabApi.Extensions;
+using YnabApi.Items;
 
 namespace Savvy.Extensions
 {
@@ -25,6 +28,15 @@ namespace Savvy.Extensions
         {
             var devices = await budget.GetRegisteredDevicesAsync();
             return devices.FirstOrDefault(f => f.HasFullKnowledge);
+        }
+    }
+
+    public static class RegisteredDeviceExtensions
+    {
+        public static async Task<IList<Category>> GetActiveCategoriesAsync(this RegisteredDevice registeredDevice)
+        {
+            var categories = await registeredDevice.GetCategoriesAsync();
+            return categories.OnlyActive().ToList();
         }
     }
 }

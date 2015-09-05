@@ -4,11 +4,12 @@ using System.Threading.Tasks;
 using Windows.UI.Xaml.Controls;
 using Caliburn.Micro;
 using Savvy.Extensions;
+using Savvy.Services.DropboxAuthentication;
 using Savvy.Services.Loading;
 using Savvy.Views.AddTransaction;
 using Savvy.Views.BudgetOverview;
+using Savvy.YnabApiFileSystem;
 using YnabApi;
-using YnabApi.Dropbox;
 
 namespace Savvy.Views.Shell.States
 {
@@ -22,13 +23,13 @@ namespace Savvy.Views.Shell.States
         private readonly NavigationItemViewModel _addTransactionItem;
         private readonly NavigationItemViewModel _refreshItem;
 
-        private readonly NavigationItemViewModel _logoutItem;
+        private readonly NavigationItemViewModel _changeBudgetItem;
 
         private Budget _budget;
         private RegisteredDevice _device;
 
         [Required]
-        public string AccessCode { get; set; }
+        public DropboxAuth Auth  { get; set; }
         [Required]
         public string BudgetName { get; set; }
 
@@ -40,33 +41,36 @@ namespace Savvy.Views.Shell.States
 
             this._overviewItem = new NavigationItemViewModel(this.Overview) { Label = "Overview", Symbol = Symbol.Globe };
             this._addTransactionItem = new NavigationItemViewModel(this.AddTransaction) { Label = "Add transaction", Symbol = Symbol.Add };
-            this._refreshItem = new NavigationItemViewModel(() => this.RefreshAsync()) { Label = "Refresh", Symbol = Symbol.Refresh };
+            this._refreshItem = new NavigationItemViewModel(this.RefreshAsync) { Label = "Refresh", Symbol = Symbol.Refresh };
 
-            this._logoutItem = new NavigationItemViewModel(this.Logout) { Label = "Logout", Symbol = Symbol.LeaveChat };
+            this._changeBudgetItem = new NavigationItemViewModel(this.ChangeBudget) { Label = "Change budget", Symbol = Symbol.Switch };
         }
 
         public override async void Enter()
         {
-            await this.RefreshAsync();
+            var api = await this._container.RegisterYnabApiAsync(this.Auth);
+
+            this._budget = await api.GetBudgetAsync(this.BudgetName);
+            this._device = await this._budget.RegisterDevice(Windows.Networking.Proximity.PeerFinder.DisplayName);
 
             this.ViewModel.Actions.Add(this._overviewItem);
             this.ViewModel.Actions.Add(this._addTransactionItem);
             this.ViewModel.Actions.Add(this._refreshItem);
 
-            this.ViewModel.SecondaryActions.Add(this._logoutItem);
+            this.ViewModel.SecondaryActions.Add(this._changeBudgetItem);
 
             this.Overview();
         }
 
         public override void Leave()
         {
-            this._container.UnregisterHandler(typeof(YnabApi.YnabApi), null);
+            this._container.UnregisterYnabApi();
 
             this.ViewModel.Actions.Remove(this._overviewItem);
             this.ViewModel.Actions.Remove(this._addTransactionItem);
             this.ViewModel.Actions.Remove(this._refreshItem);
             
-            this.ViewModel.SecondaryActions.Remove(this._logoutItem);
+            this.ViewModel.SecondaryActions.Remove(this._changeBudgetItem);
         }
 
         private void Overview()
@@ -87,21 +91,21 @@ namespace Savvy.Views.Shell.States
                 .Navigate();
         }
         
-        private async Task RefreshAsync()
+        private async void RefreshAsync()
         {
-            using (this._loadingService.Show("Registering device..."))
-            { 
-                this._container.UnregisterYnabApi();
-
-                var api = this._container.RegisterYnabApi(this.AccessCode);
-                this._budget = await api.GetBudgetAsync(this.BudgetName);
-                this._device = await this._budget.RegisterDevice(Windows.Networking.Proximity.PeerFinder.DisplayName);
+            using (this._loadingService.Show("Refreshing..."))
+            {
+                var fileSystem = this._container.GetInstance<HybridFileSystem>();
+                await fileSystem.Synchronization.RefreshLocalStateAsync();
             }
         }
 
-        private void Logout()
+        private void ChangeBudget()
         {
-            this.ViewModel.CurrentState = IoC.Get<LoggedOutShellState>();
+            var newState = IoC.Get<LoggedInShellState>();
+            newState.Auth = this.Auth;
+
+            this.ViewModel.CurrentState = newState;
         }
     }
 }

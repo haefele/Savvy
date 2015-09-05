@@ -18,7 +18,7 @@ namespace Savvy.Services.DropboxAuthentication
             this._settings = settings;
         }
         
-        public async Task<string> LoginAndGetAccessCodeAsync()
+        public async Task<DropboxAuth> LoginAndGetAccessCodeAsync()
         {
             var authenticateUrl = new Uri($"https://api.dropbox.com/1/oauth2/authorize?response_type=code&client_id={this._settings.DropboxClientId}&redirect_uri={Uri.EscapeDataString(this._settings.DropboxRedirectUrl)}");
             var authenticateResult = await WebAuthenticationBroker.AuthenticateAsync(WebAuthenticationOptions.None, authenticateUrl, new Uri(this._settings.DropboxRedirectUrl));
@@ -33,7 +33,9 @@ namespace Savvy.Services.DropboxAuthentication
                 if (accessTokenResponse.StatusCode == HttpStatusCode.OK)
                 {
                     var content = await accessTokenResponse.Content.ReadAsStringAsync();
-                    return JObject.Parse(content).Value<string>("access_token");
+                    var json = JObject.Parse(content);
+
+                    return new DropboxAuth(json.Value<string>("access_token"), json.Value<string>("uid"));
                 }
             }
 
