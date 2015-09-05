@@ -16,6 +16,9 @@ namespace Savvy.Services.Loading
 
         public IDisposable Show(string message)
         {
+            if (this._overlay.IsActive)
+                return new DisposableAction(() => { });
+
             this._overlay.Message = message;
             this._overlay.IsActive = true;
 
