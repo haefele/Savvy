@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 
 namespace Savvy.Extensions
 {
@@ -22,6 +23,11 @@ namespace Savvy.Extensions
         public static string NormalizePath(this string value)
         {
             return value.Replace('\\', '/');
+        }
+
+        public static bool Contains(this string text, string compareTo, StringComparison comparison)
+        {
+            return text.IndexOf(compareTo ?? String.Empty, comparison) > -1;
         }
     }
 }

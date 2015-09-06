@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Linq;
@@ -24,7 +25,7 @@ namespace Savvy.Views.AddTransaction
 
         private Account _selectedAccount;
         private Category _selectedCategory;
-        private Payee _selectedPayee;
+        private string _selectedPayeeName;
         private bool _isOutflow;
         private string _amount;
         private string _memo;
@@ -47,10 +48,10 @@ namespace Savvy.Views.AddTransaction
             set { this.SetProperty(ref this._selectedCategory, value); }
         }
         public BindableCollection<Payee> Payees { get; }
-        public Payee SelectedPayee
+        public string SelectedPayeeName
         {
-            get { return this._selectedPayee; }
-            set { this.SetProperty(ref this._selectedPayee, value); }
+            get { return this._selectedPayeeName; }
+            set { this.SetProperty(ref this._selectedPayeeName, value); }
         }
         public bool IsOutflow
         {
@@ -102,22 +103,33 @@ namespace Savvy.Views.AddTransaction
 
             if (this.SelectedAccount == null ||
                 this.SelectedCategory == null ||
-                this.SelectedPayee == null ||
+                this.SelectedPayeeName == null ||
                 parsedAmount == null)
                 return;
-
+            
             using (this._loadingService.Show("Saving transaction..."))
-            { 
+            {
+                List<IDeviceAction> actionsToExecute = new List<IDeviceAction>();
+
+                IHavePayeeId payee = this.Payees.FirstOrDefault(f => string.Equals(f.Name, this.SelectedPayeeName, StringComparison.OrdinalIgnoreCase));
+
+                if (payee == null)
+                {
+                    payee = new CreatePayeeDeviceAction {Name = this.SelectedPayeeName};
+                    actionsToExecute.Add((IDeviceAction)payee);
+                }
+
                 var action = new CreateTransactionDeviceAction
                 {
                     Account = this.SelectedAccount,
                     Category = this.SelectedCategory,
-                    Payee = this.SelectedPayee,
+                    Payee = payee,
                     Amount = this.IsOutflow ? -1 * parsedAmount.Value : parsedAmount.Value,
                     Memo = this.Memo
                 };
+                actionsToExecute.Add(action);
 
-                await this._device.ExecuteActions(action);
+                await this._device.ExecuteActions(actionsToExecute.ToArray());
             }
 
             this._navigationService

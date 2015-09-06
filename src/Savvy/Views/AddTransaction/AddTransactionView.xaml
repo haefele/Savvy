@@ -43,13 +43,12 @@
                       Header="Category"
                       HorizontalAlignment="Stretch"
                       />
-            
-            <ComboBox x:Name="PayeesComboBox"
-                      ItemsSource="{Binding Payees}" 
-                      SelectedItem="{Binding SelectedPayee, Mode=TwoWay}"
-                      Header="Payee" 
-                      HorizontalAlignment="Stretch"
-                      />
+
+            <AutoSuggestBox x:Name="PayeesAutoSuggestBox"
+                            ItemsSource="{Binding Payees}"
+                            Header="Payee"
+                            TextChanged="PayeesAutoSuggestBox_OnTextChanged"
+                            />
 
             <ToggleButton Content="{Binding IsOutflow, Converter={StaticResource BoolToInflowOutflowConverter}}" 
                           Margin="0, 10, 0, 0"
