@@ -24,7 +24,7 @@
         </converter:BooleanToObjectConverter>
     </UserControl.Resources>
     <Grid Visibility="{x:Bind IsActive, Converter={StaticResource IsActiveToVisibilityConverter}, Mode=OneWay}">
-        <Grid Background="Gray" Opacity="0.5" />
+        <Grid Background="Black" Opacity="0.3" />
 
         <StackPanel VerticalAlignment="Center" 
                     HorizontalAlignment="Stretch">
