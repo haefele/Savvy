@@ -102,7 +102,9 @@ namespace Savvy.Views.Shell.States
         {
             using (this._loadingService.Show("Refreshing..."))
             {
-                var api = this._container.GetInstance<YnabApi.YnabApi>();
+                this._container.UnregisterYnabApi();
+
+                var api = await this._container.RegisterYnabApiAsync(this.Auth);
                 var fileSystem = this._container.GetInstance<HybridFileSystem>();
 
                 await fileSystem.Synchronization.RefreshLocalStateAsync();
