@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Storage;
+using Windows.Storage.Streams;
 using Newtonsoft.Json.Linq;
 using Savvy.Extensions;
 using Savvy.Services.DropboxAuthentication;
@@ -17,7 +19,7 @@ namespace Savvy.YnabApiFileSystem
     {
         private readonly StorageFolder _rootFolder;
         private readonly DropboxAuth _auth;
-
+        
         public DropboxSynchronization(StorageFolder rootFolder, DropboxAuth auth)
         {
             this._rootFolder = rootFolder;
@@ -26,9 +28,10 @@ namespace Savvy.YnabApiFileSystem
         
         public async Task RefreshLocalStateAsync()
         {
-            var userFolder = await this.CreateUserFolderAsync();
+            //No using here, because if a error happens, we don't overwrite the zip file
+            var userArchive = await this.GetUserArchiveAsync(ZipArchiveMode.Update);
 
-            var ynabSettingsYroot = await this.UpdateYnabSettingsYroot(userFolder);
+            var ynabSettingsYroot = await this.UpdateYnabSettingsYroot(userArchive);
 
             var knownBudgets = ynabSettingsYroot
                 .Value<JArray>("relativeKnownBudgets")
@@ -36,15 +39,20 @@ namespace Savvy.YnabApiFileSystem
 
             foreach (var knownBudget in knownBudgets)
             {
-                await this.UpdateBudget(knownBudget, userFolder);
+                await this.UpdateBudget(knownBudget, userArchive);
             }
-        }
-        
-        public async Task<StorageFolder> CreateUserFolderAsync()
-        {
-            return await this._rootFolder.CreateFolderAsync($"Dropbox-User-{this._auth.UserId}", CreationCollisionOption.OpenIfExists);
+
+            userArchive.Dispose();
         }
 
+        public async Task<ZipArchive> GetUserArchiveAsync(ZipArchiveMode mode)
+        {
+            var zipFile = await this._rootFolder.CreateFileAsync($"{this._auth.UserId}.zip", CreationCollisionOption.OpenIfExists);
+            IRandomAccessStream stream = await zipFile.OpenAsync(mode == ZipArchiveMode.Read ? FileAccessMode.Read : FileAccessMode.ReadWrite, StorageOpenOptions.None);
+
+            return new ZipArchive(stream.AsStream(), mode, false, Encoding.UTF8);
+        }
+        
         public Task WriteFileAsync(string file, string content)
         {
             return this.GetClient()
@@ -53,7 +61,7 @@ namespace Savvy.YnabApiFileSystem
 
         #region Private Methods
 
-        private async Task<JObject> UpdateYnabSettingsYroot(StorageFolder userFolder)
+        private async Task<JObject> UpdateYnabSettingsYroot(ZipArchive userArchive)
         {
             var dropboxResult = await this.GetClient()
                 .GetAsync("https://content.dropboxapi.com/1/files/auto/.ynabSettings.yroot");
@@ -62,9 +70,9 @@ namespace Savvy.YnabApiFileSystem
                 return null;
 
             var content = await dropboxResult.Content.ReadAsByteArrayAsync();
-            var localYnabSettingsYrootFile = await userFolder.CreateFileAsync(".ynabSettings.yroot", CreationCollisionOption.ReplaceExisting);
 
-            using (var stream = await localYnabSettingsYrootFile.OpenStreamForWriteAsync())
+            var entry = userArchive.GetOrCreateEntry(".ynabSettings.yroot");
+            using (var stream = entry.Open())
             {
                 await stream.WriteAsync(content, 0, content.Length);
             }
@@ -72,38 +80,37 @@ namespace Savvy.YnabApiFileSystem
             return JObject.Parse(Encoding.UTF8.GetString(content));
         }
 
-        private async Task UpdateBudget(string knownBudgetPath, StorageFolder userFolder)
+        private async Task UpdateBudget(string budgetPath, ZipArchive userArchive)
         {
-            var budgetFolder = await userFolder.CreateFolderStructureAsync(knownBudgetPath);
-            var dropboxCursor = await this.ReadCursorForBudget(budgetFolder);
+            var dropboxCursor = await this.ReadCursorForBudget(userArchive, budgetPath);
 
-            var changes = await this.GetChangesAsync(knownBudgetPath, dropboxCursor);
-            await this.ApplyChangesAsync(knownBudgetPath, budgetFolder, changes);
+            var changes = await this.GetChangesAsync(budgetPath, dropboxCursor);
+            await this.ApplyChangesAsync(userArchive, budgetPath, changes);
 
-            await this.UpdateCursorForBudget(budgetFolder, changes.Cursor);
+            await this.UpdateCursorForBudget(userArchive, budgetPath, changes.Cursor);
         }
 
-        private async Task UpdateCursorForBudget(StorageFolder budgetFolder, string cursor)
+        private async Task<string> ReadCursorForBudget(ZipArchive userArchive, string budgetPath)
         {
-            var cursorFile = await budgetFolder.CreateFileAsync("DropboxDeltaCursor.txt", CreationCollisionOption.OpenIfExists);
+            var cursorFilePath = Path.Combine(budgetPath, "DropboxDeltaCursor.txt");
+            
+            using (var stream = userArchive.GetOrCreateEntry(cursorFilePath).Open())
+            using (var reader = new StreamReader(stream, Encoding.UTF8))
+            {
+                return await reader.ReadToEndAsync();
+            }
+        }
+        private async Task UpdateCursorForBudget(ZipArchive userArchive, string budgetPath, string cursor)
+        {
+            var cursorFilePath = Path.Combine(budgetPath, "DropboxDeltaCursor.txt");
 
-            using (var stream = await cursorFile.OpenStreamForWriteAsync())
+            using (var stream = userArchive.GetOrCreateEntry(cursorFilePath).Open())
             using (var writer = new StreamWriter(stream, Encoding.UTF8))
             {
                 await writer.WriteAsync(cursor);
             }
         }
 
-        private async Task<string> ReadCursorForBudget(StorageFolder budgetFolder)
-        {
-            var cursorFile = await budgetFolder.CreateFileAsync("DropboxDeltaCursor.txt", CreationCollisionOption.OpenIfExists);
-
-            using (var stream = await cursorFile.OpenStreamForReadAsync())
-            using (var reader = new StreamReader(stream, Encoding.UTF8))
-            {
-                return await reader.ReadToEndAsync();
-            }
-        }
 
         private async Task<Changes> GetChangesAsync(string budgetPath, string dropboxCursor)
         {
@@ -139,77 +146,75 @@ namespace Savvy.YnabApiFileSystem
             return new Changes(dropboxCursor, changes, reset);
         }
 
-        private async Task ApplyChangesAsync(string knownBudgetPath, StorageFolder budgetFolder, Changes changes)
+        private async Task ApplyChangesAsync(ZipArchive userArchive, string budgetPath, Changes changes)
         {
             if (changes.Reset)
             {
-                await this.ResetBudgetFolderAsync(budgetFolder);
+                this.ResetBudgetFolder(userArchive, budgetPath);
             }
 
             foreach (KeyValuePair<string, JObject> change in changes.Items)
             {
                 bool isDirectory = change.Value.Value<bool>("is_dir");
-                string relativePath = change.Value.Value<string>("path").Substring(knownBudgetPath.Length + 1); // +1 for trailing slash
+                string path = change.Value.Value<string>("path");
                 bool delete = change.Value == null;
 
                 if (isDirectory)
                 {
-                    await this.ApplyDirectoryChangeAsync(budgetFolder, relativePath, delete);
+                    this.ApplyDirectoryChange(userArchive, path, delete);
                 }
                 else
                 {
-                    await this.ApplyFileChangeAsync(budgetFolder, relativePath, change.Key, delete);
+                    await this.ApplyFileChangeAsync(userArchive, path, delete);
                 }
             }
         }
 
-        private async Task ApplyDirectoryChangeAsync(StorageFolder budgetFolder, string relativePath, bool delete)
+        private void ResetBudgetFolder(ZipArchive userArchive, string budgetPath)
         {
-            var folder = await budgetFolder.CreateFolderStructureAsync(relativePath);
+            var entriesToDelete = userArchive.Entries
+                .Where(f => f.FullName.StartsWith(budgetPath))
+                .Where(f => f.Name != "DropboxDeltaCursor.txt")
+                .ToList();
 
-            if (delete)
+            foreach (var entry in entriesToDelete)
             {
-                await folder.DeleteAsync();
+                entry.Delete();
             }
         }
 
-        private async Task ApplyFileChangeAsync(StorageFolder budgetFolder, string relativePath, string filePath, bool delete)
+        private void ApplyDirectoryChange(ZipArchive userArchive, string path, bool delete)
         {
-            var folders = Path.GetDirectoryName(relativePath);
-            var fileName = Path.GetFileName(relativePath);
-
-            var subFolder = await budgetFolder.CreateFolderStructureAsync(folders);
-
-            var file = await subFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
             if (delete)
             {
-                await file.DeleteAsync();
+                var entriesToDelete = userArchive.Entries.Where(f => f.FullName.StartsWith(path));
+                foreach (var entry in entriesToDelete)
+                {
+                    entry.Delete();
+                }
+            }
+        }
+
+        private async Task ApplyFileChangeAsync(ZipArchive userArchive, string path, bool delete)
+        {
+            path = path.TrimStart('/', '\\');
+
+            var entry = userArchive.GetOrCreateEntry(path);
+
+            if (delete)
+            {
+                entry.Delete();
             }
             else
             {
                 var fileResponse = await this.GetClient()
-                    .GetAsync($"https://content.dropboxapi.com/1/files/auto/{filePath}");
+                    .GetAsync($"https://content.dropboxapi.com/1/files/auto/{path}");
 
-                using (var stream = await file.OpenStreamForWriteAsync())
+                using (var stream = entry.Open())
                 {
                     var responseStream = await fileResponse.Content.ReadAsStreamAsync();
                     await responseStream.CopyToAsync(stream);
                 }
-            }
-        }
-
-        private async Task ResetBudgetFolderAsync(StorageFolder budgetFolder)
-        {
-            foreach (var folder in await budgetFolder.GetFoldersAsync())
-            {
-                await folder.DeleteAsync();
-            }
-            foreach (var file in await budgetFolder.GetFilesAsync())
-            {
-                if (file.Name == "DropboxDeltaCursor.txt")
-                    continue;
-
-                await file.DeleteAsync();
             }
         }
 

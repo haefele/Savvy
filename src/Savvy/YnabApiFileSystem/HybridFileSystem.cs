@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,53 +23,68 @@ namespace Savvy.YnabApiFileSystem
 
         public async Task<string> ReadFileAsync(string filePath)
         {
-            var root = await this.Synchronization.CreateUserFolderAsync();
-
-            var folderStructure = Path.GetDirectoryName(filePath);
-            var folder = await root.CreateFolderStructureAsync(folderStructure);
-            var file = await folder.CreateFileAsync(Path.GetFileName(filePath), CreationCollisionOption.OpenIfExists);
-
-            using (var stream = await file.OpenStreamForReadAsync())
-            using (var reader = new StreamReader(stream, Encoding.UTF8))
+            try
             {
-                return await reader.ReadToEndAsync();
+                using (var archive = await this.Synchronization.GetUserArchiveAsync(ZipArchiveMode.Read))
+                {
+                    var entry = archive.GetOrCreateEntry(filePath);
+
+                    using (var stream = entry.Open())
+                    using (var reader = new StreamReader(stream, Encoding.UTF8))
+                    {
+                        return await reader.ReadToEndAsync();
+                    }
+                }
+            }
+            catch
+            {
+                return null;
             }
         }
 
         public async Task<IList<string>> GetFilesAsync(string directory)
         {
-            var root = await this.Synchronization.CreateUserFolderAsync();
-
-            var folder = await root.CreateFolderStructureAsync(directory);
-            var allFiles = await folder.GetFilesAsync();
-
-            return allFiles
-                .Select(f => f.Name)
-                .Select(f => Path.Combine(directory, f))
-                .ToList();
+            try
+            {
+                using (var archive = await this.Synchronization.GetUserArchiveAsync(ZipArchiveMode.Read))
+                {
+                    return archive.Entries
+                        .Where(f => f.FullName.NormalizePath().StartsWith(directory.NormalizePath(), StringComparison.OrdinalIgnoreCase))
+                        .Select(f => f.Name)
+                        .Select(f => Path.Combine(directory, f))
+                        .ToList();
+                }
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         public async Task WriteFileAsync(string filePath, string content)
         {
-            var root = await this.Synchronization.CreateUserFolderAsync();
-
-            var folderStructure = Path.GetDirectoryName(filePath);
-            var folder = await root.CreateFolderStructureAsync(folderStructure);
-            var file = await folder.CreateFileAsync(Path.GetFileName(filePath), CreationCollisionOption.ReplaceExisting);
-
-            using (var stream = await file.OpenStreamForWriteAsync())
-            using (var writer = new StreamWriter(stream, Encoding.UTF8))
+            using (var archive = await this.Synchronization.GetUserArchiveAsync(ZipArchiveMode.Update))
             {
-                await writer.WriteAsync(content);
+                var entry = archive.GetOrCreateNewEntry(filePath);
+
+                using (var stream = entry.Open())
+                using (var writer = new StreamWriter(stream, Encoding.UTF8))
+                {
+                    await writer.WriteAsync(content);
+                }
             }
 
             await this.Synchronization.WriteFileAsync(filePath, content);
         }
 
-        public async Task CreateDirectoryAsync(string directory)
+        public Task CreateDirectoryAsync(string directory)
         {
-            var root = await this.Synchronization.CreateUserFolderAsync();
-            await root.CreateFolderStructureAsync(directory);
+            return Task.CompletedTask;
+        }
+
+        public Task FlushWritesAsync()
+        {
+            return Task.CompletedTask;
         }
     }
 }

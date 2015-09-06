@@ -18,5 +18,10 @@ namespace Savvy.Extensions
 
             return null;
         }
+
+        public static string NormalizePath(this string value)
+        {
+            return value.Replace('\\', '/');
+        }
     }
 }

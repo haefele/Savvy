@@ -1,5 +1,8 @@
 ﻿using System;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
+using System.Text;
 using System.Windows.Input;
 using Windows.Security.Authentication.Web;
 using Windows.UI.Popups;

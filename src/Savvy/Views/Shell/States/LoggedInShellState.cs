@@ -47,25 +47,36 @@ namespace Savvy.Views.Shell.States
 
                 var api = await this._container.RegisterYnabApiAsync(this.Auth);
 
-                await this.RefreshAsync();
-
-                this.ViewModel.SecondaryActions.Add(this._logoutItem);
-
                 IList<Budget> budgets = await api.GetBudgetsAsync();
 
-                this._budgetItems = budgets
-                    .Select(f => new NavigationItemViewModel(() => this.OpenBudget(f)) {Label = f.BudgetName, Symbol = Symbol.Account})
-                    .ToList();
+                if (budgets.Count == 0)
+                    await this.RefreshAsync();
 
-                this.ViewModel.Actions.AddRange(this._budgetItems);
-                this.ViewModel.Actions.Add(this._refreshItem);
+                budgets = await api.GetBudgetsAsync();
+                this.AddActions(budgets);
             }
         }
 
         public override void Leave()
         {
             this._container.UnregisterYnabApi();
+            this.RemoveActions();
+        }
 
+        private void AddActions(IList<Budget> budgets)
+        {
+            this.ViewModel.SecondaryActions.Add(this._logoutItem);
+
+            this._budgetItems = budgets
+                .Select(f => new NavigationItemViewModel(() => this.OpenBudget(f)) { Label = f.BudgetName, Symbol = Symbol.OpenLocal })
+                .ToList();
+
+            this.ViewModel.Actions.AddRange(this._budgetItems);
+            this.ViewModel.Actions.Add(this._refreshItem);
+        }
+
+        private void RemoveActions()
+        {
             this.ViewModel.SecondaryActions.Remove(this._logoutItem);
 
             foreach (var budgetItem in this._budgetItems)
@@ -88,8 +99,13 @@ namespace Savvy.Views.Shell.States
         {
             using (this._loadingService.Show("Refreshing..."))
             {
+                var api = this._container.GetInstance<YnabApi.YnabApi>();
                 var fileSystem = this._container.GetInstance<HybridFileSystem>();
+
                 await fileSystem.Synchronization.RefreshLocalStateAsync();
+                
+                this.RemoveActions();
+                this.AddActions(await api.GetBudgetsAsync());
             }
         }
 

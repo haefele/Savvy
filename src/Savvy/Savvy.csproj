@@ -99,6 +99,7 @@
     </Compile>
     <Compile Include="Common\DisposableAction.cs" />
     <Compile Include="Extensions\StorageFolderExtensions.cs" />
+    <Compile Include="Extensions\ZipArchiveExtensions.cs" />
     <Compile Include="Services\DropboxAuthentication\DropboxAuth.cs" />
     <Compile Include="Views\AllBudgetsOverview\AllBudgetsOverviewView.xaml.cs">
       <DependentUpon>AllBudgetsOverviewView.xaml</DependentUpon>
