@@ -52,7 +52,6 @@ namespace Savvy.Views.Shell.States
                 if (budgets.Count == 0)
                     await this.RefreshAsync();
 
-                budgets = await api.GetBudgetsAsync();
                 this.AddActions(budgets);
             }
         }
@@ -78,8 +77,8 @@ namespace Savvy.Views.Shell.States
         private void RemoveActions()
         {
             this.ViewModel.SecondaryActions.Remove(this._logoutItem);
-
-            foreach (var budgetItem in this._budgetItems)
+            
+            foreach (var budgetItem in this._budgetItems ?? new List<NavigationItemViewModel>())
             {
                 this.ViewModel.Actions.Remove(budgetItem);
             }
