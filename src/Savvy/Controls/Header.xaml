@@ -14,13 +14,14 @@
 
     <Grid>
         <RelativePanel Grid.Row="0"
-                       Background="Gray">
+                       Background="{ThemeResource SystemListAccentMediumColor}">
             <Button x:Name="NavigationButton"
                     Click="NavigationButtonOnClick" 
                     Content="&#xE700;" 
                     FontSize="20"
                     Width="48"
                     Height="48"
+                    Background="{ThemeResource SystemListAccentLowColor}"
                     FontFamily="{ThemeResource SymbolThemeFontFamily}"/>
             <TextBlock RelativePanel.AlignVerticalCenterWith="NavigationButton"
                        RelativePanel.RightOf="NavigationButton"
