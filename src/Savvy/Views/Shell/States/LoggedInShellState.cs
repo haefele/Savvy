@@ -49,10 +49,14 @@ namespace Savvy.Views.Shell.States
 
                 IList<Budget> budgets = await api.GetBudgetsAsync();
 
-                if (budgets.Count == 0)
+                if (budgets.Any())
+                {
+                    this.AddActions(budgets);
+                }
+                else
+                {
                     await this.RefreshAsync();
-
-                this.AddActions(budgets);
+                }
             }
         }
 
@@ -67,7 +71,7 @@ namespace Savvy.Views.Shell.States
             this.ViewModel.SecondaryActions.Add(this._logoutItem);
 
             this._budgetItems = budgets
-                .Select(f => new NavigationItemViewModel(() => this.OpenBudget(f)) { Label = f.BudgetName, Symbol = Symbol.OpenLocal })
+                .Select(f => new NavigationItemViewModel(() => this.OpenBudget(f)) { Label = f.BudgetName, Symbol = Symbol.Folder })
                 .ToList();
 
             this.ViewModel.Actions.AddRange(this._budgetItems);
