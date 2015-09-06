@@ -17,6 +17,7 @@ namespace Savvy.YnabApiFileSystem
         public HybridFileSystem(StorageFolder rootFolder, DropboxAuth auth)
         {
             this.Synchronization = new DropboxSynchronization(rootFolder, auth);
+            this._queuedFilesToWrite = new List<Tuple<string, string>>();
         }
 
         public DropboxSynchronization Synchronization { get; }
@@ -61,20 +62,13 @@ namespace Savvy.YnabApiFileSystem
             }
         }
 
-        public async Task WriteFileAsync(string filePath, string content)
+        private IList<Tuple<string, string>> _queuedFilesToWrite;
+
+        public Task WriteFileAsync(string filePath, string content)
         {
-            using (var archive = await this.Synchronization.GetUserArchiveAsync(ZipArchiveMode.Update))
-            {
-                var entry = archive.GetOrCreateNewEntry(filePath);
+            this._queuedFilesToWrite.Add(Tuple.Create(filePath, content));
 
-                using (var stream = entry.Open())
-                using (var writer = new StreamWriter(stream, Encoding.UTF8))
-                {
-                    await writer.WriteAsync(content);
-                }
-            }
-
-            await this.Synchronization.WriteFileAsync(filePath, content);
+            return Task.CompletedTask;
         }
 
         public Task CreateDirectoryAsync(string directory)
@@ -82,9 +76,27 @@ namespace Savvy.YnabApiFileSystem
             return Task.CompletedTask;
         }
 
-        public Task FlushWritesAsync()
+        public async Task FlushWritesAsync()
         {
-            return Task.CompletedTask;
+            //No using here, because if an error happens, we don't overwrite the zip file
+            var archive = await this.Synchronization.GetUserArchiveAsync(ZipArchiveMode.Update);
+
+            foreach(var fileToWrite in this._queuedFilesToWrite)
+            { 
+                var entry = archive.GetOrCreateNewEntry(fileToWrite.Item1);
+
+                using (var stream = entry.Open())
+                using (var writer = new StreamWriter(stream, Encoding.UTF8))
+                {
+                    var writeTask = writer.WriteAsync(fileToWrite.Item2);
+                    var uploadTask = this.Synchronization.WriteFileAsync(fileToWrite.Item1, fileToWrite.Item2);
+
+                    await Task.WhenAll(writeTask, uploadTask);
+                }
+            }
+
+            this._queuedFilesToWrite = new List<Tuple<string, string>>();
+            archive.Dispose();
         }
     }
 }
