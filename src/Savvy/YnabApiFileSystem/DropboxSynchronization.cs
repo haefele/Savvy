@@ -28,7 +28,7 @@ namespace Savvy.YnabApiFileSystem
         
         public async Task RefreshLocalStateAsync()
         {
-            //No using here, because if a error happens, we don't overwrite the zip file
+            //No using here, because if an error happens, we don't overwrite the zip file
             var userArchive = await this.GetUserArchiveAsync(ZipArchiveMode.Update);
 
             var ynabSettingsYroot = await this.UpdateYnabSettingsYroot(userArchive);
