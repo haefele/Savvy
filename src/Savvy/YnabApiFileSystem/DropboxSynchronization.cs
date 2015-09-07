@@ -202,7 +202,7 @@ namespace Savvy.YnabApiFileSystem
         {
             path = path.TrimStart('/', '\\');
 
-            var entry = userArchive.GetOrCreateEntry(path);
+            var entry = userArchive.GetOrCreateNewEntry(path);
             
             var fileResponse = await this.GetClient()
                 .GetAsync($"https://content.dropboxapi.com/1/files/auto/{path}");
