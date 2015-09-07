@@ -45,8 +45,8 @@
                       />
 
             <AutoSuggestBox x:Name="PayeesAutoSuggestBox"
-                            ItemsSource="{Binding Payees}"
                             Header="Payee"
+                            Text="{Binding SelectedPayeeName, Mode=TwoWay}"
                             TextChanged="PayeesAutoSuggestBox_OnTextChanged"
                             />
 
