@@ -12,18 +12,19 @@ using Windows.Storage.Streams;
 using Newtonsoft.Json.Linq;
 using Savvy.Extensions;
 using Savvy.Services.DropboxAuthentication;
+using Savvy.Services.SessionState;
 
 namespace Savvy.YnabApiFileSystem
 {
     public class DropboxSynchronization
     {
         private readonly StorageFolder _rootFolder;
-        private readonly DropboxAuth _auth;
+        private readonly ISessionStateService _sessionStateService;
         
-        public DropboxSynchronization(StorageFolder rootFolder, DropboxAuth auth)
+        public DropboxSynchronization(StorageFolder rootFolder, ISessionStateService sessionStateService)
         {
             this._rootFolder = rootFolder;
-            this._auth = auth;
+            this._sessionStateService = sessionStateService;
         }
         
         public async Task RefreshLocalStateAsync()
@@ -47,7 +48,7 @@ namespace Savvy.YnabApiFileSystem
 
         public async Task<ZipArchive> GetUserArchiveAsync(ZipArchiveMode mode)
         {
-            var zipFile = await this._rootFolder.CreateFileAsync($"{this._auth.UserId}.zip", CreationCollisionOption.OpenIfExists);
+            var zipFile = await this._rootFolder.CreateFileAsync($"{this._sessionStateService.DropboxUserId}.zip", CreationCollisionOption.OpenIfExists);
             IRandomAccessStream stream = await zipFile.OpenAsync(mode == ZipArchiveMode.Read ? FileAccessMode.Read : FileAccessMode.ReadWrite, StorageOpenOptions.None);
 
             return new ZipArchive(stream.AsStream(), mode, false, Encoding.UTF8);
@@ -215,7 +216,7 @@ namespace Savvy.YnabApiFileSystem
 
         private HttpClient GetClient()
         {
-            var handler = new AccessCodeMessageHandler(this._auth.AccessCode, new HttpClientHandler());
+            var handler = new AccessCodeMessageHandler(this._sessionStateService.DropboxAccessCode, new HttpClientHandler());
             return new HttpClient(handler);
         }
         #endregion

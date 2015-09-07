@@ -4,6 +4,7 @@ using Windows.Storage;
 using Windows.UI.Xaml.Controls;
 using Caliburn.Micro;
 using Savvy.Services.DropboxAuthentication;
+using Savvy.Services.SessionState;
 using Savvy.Views.Welcome;
 using Savvy.YnabApiFileSystem;
 
@@ -13,13 +14,15 @@ namespace Savvy.Views.Shell.States
     {
         private readonly INavigationService _navigationService;
         private readonly IDropboxAuthenticationService _dropboxAuthenticationService;
+        private readonly ISessionStateService _sessionStateService;
 
         private readonly NavigationItemViewModel _loginItem;
 
-        public LoggedOutShellState(INavigationService navigationService, IDropboxAuthenticationService dropboxAuthenticationService)
+        public LoggedOutShellState(INavigationService navigationService, IDropboxAuthenticationService dropboxAuthenticationService, ISessionStateService sessionStateService)
         {
             this._navigationService = navigationService;
             this._dropboxAuthenticationService = dropboxAuthenticationService;
+            this._sessionStateService = sessionStateService;
 
             this._loginItem = new NavigationItemViewModel(this.Login) { Label = "Login", Symbol = Symbol.NewWindow };
         }
@@ -42,11 +45,11 @@ namespace Savvy.Views.Shell.States
 
             if (auth == null)
                 return;
-            
-            var newState = IoC.Get<LoggedInShellState>();
-            newState.Auth = auth;
 
-            this.ViewModel.CurrentState = newState;
+            this._sessionStateService.DropboxUserId = auth.UserId;
+            this._sessionStateService.DropboxAccessCode = auth.AccessCode;
+            
+            this.ViewModel.CurrentState = IoC.Get<LoggedInShellState>();
         }
     }
 }

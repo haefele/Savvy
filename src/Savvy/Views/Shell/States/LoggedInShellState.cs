@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,6 +8,7 @@ using Caliburn.Micro;
 using Savvy.Extensions;
 using Savvy.Services.DropboxAuthentication;
 using Savvy.Services.Loading;
+using Savvy.Services.SessionState;
 using Savvy.Views.AllBudgetsOverview;
 using Savvy.YnabApiFileSystem;
 using YnabApi;
@@ -18,20 +20,19 @@ namespace Savvy.Views.Shell.States
         private readonly WinRTContainer _container;
         private readonly INavigationService _navigationService;
         private readonly ILoadingService _loadingService;
+        private readonly ISessionStateService _sessionStateService;
 
         private readonly NavigationItemViewModel _refreshItem;
         private readonly NavigationItemViewModel _logoutItem;
 
         private IList<NavigationItemViewModel> _budgetItems;
-
-        [Required]
-        public DropboxAuth Auth { get; set; }
-
-        public LoggedInShellState(WinRTContainer container, INavigationService navigationService, ILoadingService loadingService)
+        
+        public LoggedInShellState(WinRTContainer container, INavigationService navigationService, ILoadingService loadingService, ISessionStateService sessionStateService)
         {
             this._container = container;
             this._navigationService = navigationService;
             this._loadingService = loadingService;
+            this._sessionStateService = sessionStateService;
 
             this._refreshItem = new NavigationItemViewModel(async () => await this.RefreshAsync()) { Label = "Refresh", Symbol = Symbol.Refresh };
             this._logoutItem = new NavigationItemViewModel(this.Logout) { Label = "Logout", Symbol = Symbol.LeaveChat };
@@ -45,7 +46,7 @@ namespace Savvy.Views.Shell.States
                     .For<AllBudgetsOverviewViewModel>()
                     .Navigate();
 
-                var api = await this._container.RegisterYnabApiAsync(this.Auth);
+                var api = await this._container.RegisterYnabApiAsync();
 
                 IList<Budget> budgets = await api.GetBudgetsAsync();
 
@@ -91,8 +92,9 @@ namespace Savvy.Views.Shell.States
         
         private void OpenBudget(Budget budget)
         {
+            this._sessionStateService.BudgetName = budget.BudgetName;
+
             var newState = IoC.Get<OpenBudgetShellState>();
-            newState.Auth = this.Auth;
             newState.BudgetName = budget.BudgetName;
 
             this.ViewModel.CurrentState = newState;
@@ -104,7 +106,7 @@ namespace Savvy.Views.Shell.States
             {
                 this._container.UnregisterYnabApi();
 
-                var api = await this._container.RegisterYnabApiAsync(this.Auth);
+                var api = await this._container.RegisterYnabApiAsync();
                 var fileSystem = this._container.GetInstance<HybridFileSystem>();
 
                 await fileSystem.Synchronization.RefreshLocalStateAsync();
@@ -116,6 +118,9 @@ namespace Savvy.Views.Shell.States
 
         private void Logout()
         {
+            this._sessionStateService.DropboxAccessCode = null;
+            this._sessionStateService.DropboxUserId = null;
+
             this.ViewModel.CurrentState = IoC.Get<LoggedOutShellState>();
         }
     }

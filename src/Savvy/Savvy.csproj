@@ -101,6 +101,8 @@
     <Compile Include="Extensions\StorageFolderExtensions.cs" />
     <Compile Include="Extensions\ZipArchiveExtensions.cs" />
     <Compile Include="Services\DropboxAuthentication\DropboxAuth.cs" />
+    <Compile Include="Services\SessionState\ISessionStateService.cs" />
+    <Compile Include="Services\SessionState\SessionStateService.cs" />
     <Compile Include="Views\AllBudgetsOverview\AllBudgetsOverviewView.xaml.cs">
       <DependentUpon>AllBudgetsOverviewView.xaml</DependentUpon>
     </Compile>

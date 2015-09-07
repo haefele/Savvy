@@ -6,6 +6,7 @@ using Caliburn.Micro;
 using Savvy.Extensions;
 using Savvy.Services.DropboxAuthentication;
 using Savvy.Services.Loading;
+using Savvy.Services.SessionState;
 using Savvy.Views.AddTransaction;
 using Savvy.Views.BudgetOverview;
 using Savvy.YnabApiFileSystem;
@@ -18,6 +19,7 @@ namespace Savvy.Views.Shell.States
         private readonly WinRTContainer _container;
         private readonly INavigationService _navigationService;
         private readonly ILoadingService _loadingService;
+        private readonly ISessionStateService _sessionStateService;
 
         private readonly NavigationItemViewModel _overviewItem;
         private readonly NavigationItemViewModel _addTransactionItem;
@@ -27,17 +29,16 @@ namespace Savvy.Views.Shell.States
 
         private Budget _budget;
         private RegisteredDevice _device;
-
-        [Required]
-        public DropboxAuth Auth  { get; set; }
+        
         [Required]
         public string BudgetName { get; set; }
 
-        public OpenBudgetShellState(WinRTContainer container, INavigationService navigationService, ILoadingService loadingService)
+        public OpenBudgetShellState(WinRTContainer container, INavigationService navigationService, ILoadingService loadingService, ISessionStateService sessionStateService)
         {
             this._container = container;
             this._navigationService = navigationService;
             this._loadingService = loadingService;
+            this._sessionStateService = sessionStateService;
 
             this._overviewItem = new NavigationItemViewModel(this.Overview) { Label = "Overview", Symbol = Symbol.Globe };
             this._addTransactionItem = new NavigationItemViewModel(this.AddTransaction) { Label = "Add transaction", Symbol = Symbol.Add };
@@ -48,7 +49,7 @@ namespace Savvy.Views.Shell.States
 
         public override async void Enter()
         {
-            var api = await this._container.RegisterYnabApiAsync(this.Auth);
+            var api = await this._container.RegisterYnabApiAsync();
 
             this._budget = await api.GetBudgetAsync(this.BudgetName);
             this._device = await this._budget.RegisterDevice(Windows.Networking.Proximity.PeerFinder.DisplayName);
@@ -102,10 +103,8 @@ namespace Savvy.Views.Shell.States
 
         private void ChangeBudget()
         {
-            var newState = IoC.Get<LoggedInShellState>();
-            newState.Auth = this.Auth;
-
-            this.ViewModel.CurrentState = newState;
+            this._sessionStateService.BudgetName = null;
+            this.ViewModel.CurrentState = IoC.Get<LoggedInShellState>();
         }
     }
 }

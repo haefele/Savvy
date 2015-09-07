@@ -8,15 +8,16 @@ using System.Threading.Tasks;
 using Windows.Storage;
 using Savvy.Extensions;
 using Savvy.Services.DropboxAuthentication;
+using Savvy.Services.SessionState;
 using YnabApi.Files;
 
 namespace Savvy.YnabApiFileSystem
 {
     public class HybridFileSystem : IFileSystem
     {
-        public HybridFileSystem(StorageFolder rootFolder, DropboxAuth auth)
+        public HybridFileSystem(StorageFolder rootFolder, ISessionStateService sessionStateService)
         {
-            this.Synchronization = new DropboxSynchronization(rootFolder, auth);
+            this.Synchronization = new DropboxSynchronization(rootFolder, sessionStateService);
             this._queuedFilesToWrite = new List<Tuple<string, string>>();
         }
 

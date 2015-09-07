@@ -7,6 +7,7 @@ using System.Windows.Input;
 using Windows.Security.Authentication.Web;
 using Windows.UI.Popups;
 using Caliburn.Micro;
+using Savvy.Services.SessionState;
 using Savvy.Services.Settings;
 using Savvy.Views.Shell.States;
 
@@ -15,6 +16,7 @@ namespace Savvy.Views.Shell
     public class ShellViewModel : Screen
     {
         private readonly INavigationService _navigationService;
+        private readonly ISessionStateService _sessionStateService;
 
         private ShellState _currentState;
 
@@ -37,9 +39,10 @@ namespace Savvy.Views.Shell
             }
         }
 
-        public ShellViewModel(INavigationService navigationService)
+        public ShellViewModel(INavigationService navigationService, ISessionStateService sessionStateService)
         {
             this._navigationService = navigationService;
+            this._sessionStateService = sessionStateService;
 
             this.Actions = new BindableCollection<NavigationItemViewModel>();
             this.SecondaryActions = new BindableCollection<NavigationItemViewModel>();
@@ -47,7 +50,25 @@ namespace Savvy.Views.Shell
         
         protected override void OnActivate()
         {
-            this.CurrentState = IoC.Get<LoggedOutShellState>();
+            if (this._sessionStateService.DropboxAccessCode != null &&
+                this._sessionStateService.DropboxUserId != null)
+            {
+                if (this._sessionStateService.BudgetName != null)
+                {
+                    var newShellState = IoC.Get<OpenBudgetShellState>();
+                    newShellState.BudgetName = this._sessionStateService.BudgetName;
+
+                    this.CurrentState = newShellState;
+                }
+                else
+                {
+                    this.CurrentState = IoC.Get<LoggedInShellState>();
+                }
+            }
+            else
+            {
+                this.CurrentState = IoC.Get<LoggedOutShellState>();
+            }
         }
     }
 }
