@@ -155,18 +155,32 @@ namespace Savvy.YnabApiFileSystem
 
             foreach (KeyValuePair<string, JObject> change in changes.Items)
             {
-                bool isDirectory = change.Value.Value<bool>("is_dir");
-                string path = change.Value.Value<string>("path");
                 bool delete = change.Value == null;
+                string path = delete == false 
+                    ? change.Value.Value<string>("path")
+                    : change.Key;
 
-                if (isDirectory)
+                if (delete)
                 {
-                    this.ApplyDirectoryChange(userArchive, path, delete);
+                    this.ApplyDeleteChange(userArchive, path);
                 }
                 else
                 {
-                    await this.ApplyFileChangeAsync(userArchive, path, delete);
+                    bool isDirectory = change.Value.Value<bool>("is_dir");
+                    if (isDirectory == false)
+                    {
+                        await this.ApplyFileChangeAsync(userArchive, path);
+                    }
                 }
+            }
+        }
+
+        private void ApplyDeleteChange(ZipArchive userArchive, string path)
+        {
+            var entriesToDelete = userArchive.Entries.Where(f => f.FullName.StartsWith(path, StringComparison.OrdinalIgnoreCase));
+            foreach (var entry in entriesToDelete)
+            {
+                entry.Delete();
             }
         }
 
@@ -182,39 +196,20 @@ namespace Savvy.YnabApiFileSystem
                 entry.Delete();
             }
         }
-
-        private void ApplyDirectoryChange(ZipArchive userArchive, string path, bool delete)
-        {
-            if (delete)
-            {
-                var entriesToDelete = userArchive.Entries.Where(f => f.FullName.StartsWith(path));
-                foreach (var entry in entriesToDelete)
-                {
-                    entry.Delete();
-                }
-            }
-        }
-
-        private async Task ApplyFileChangeAsync(ZipArchive userArchive, string path, bool delete)
+        
+        private async Task ApplyFileChangeAsync(ZipArchive userArchive, string path)
         {
             path = path.TrimStart('/', '\\');
 
             var entry = userArchive.GetOrCreateEntry(path);
+            
+            var fileResponse = await this.GetClient()
+                .GetAsync($"https://content.dropboxapi.com/1/files/auto/{path}");
 
-            if (delete)
+            using (var stream = entry.Open())
             {
-                entry.Delete();
-            }
-            else
-            {
-                var fileResponse = await this.GetClient()
-                    .GetAsync($"https://content.dropboxapi.com/1/files/auto/{path}");
-
-                using (var stream = entry.Open())
-                {
-                    var responseStream = await fileResponse.Content.ReadAsStreamAsync();
-                    await responseStream.CopyToAsync(stream);
-                }
+                var responseStream = await fileResponse.Content.ReadAsStreamAsync();
+                await responseStream.CopyToAsync(stream);
             }
         }
 

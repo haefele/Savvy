@@ -29,5 +29,10 @@ namespace Savvy.Extensions
         {
             return text.IndexOf(compareTo ?? String.Empty, comparison) > -1;
         }
+
+        public static bool StartsWith(this string text, string compareTo, StringComparison comparison)
+        {
+            return text.IndexOf(compareTo ?? string.Empty, comparison) == 0;
+        }
     }
 }
