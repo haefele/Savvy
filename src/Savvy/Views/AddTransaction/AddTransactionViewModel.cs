@@ -29,6 +29,7 @@ namespace Savvy.Views.AddTransaction
         private bool _isOutflow;
         private string _amount;
         private string _memo;
+        private bool _cleared;
 
         [Required]
         public string BudgetName { get; set; }
@@ -68,7 +69,12 @@ namespace Savvy.Views.AddTransaction
             get { return this._memo; }
             set { this.SetProperty(ref this._memo, value); }
         }
-        
+        public bool Cleared
+        {
+            get { return this._cleared; }
+            set { this.SetProperty(ref this._cleared, value); }
+        }
+
         public AddTransactionViewModel(YnabApi.YnabApi api, INavigationService navigationService, ILoadingService loadingService)
         {
             this._api = api;
@@ -125,7 +131,8 @@ namespace Savvy.Views.AddTransaction
                     Category = this.SelectedCategory,
                     Payee = payee,
                     Amount = this.IsOutflow ? -1 * parsedAmount.Value : parsedAmount.Value,
-                    Memo = this.Memo
+                    Memo = this.Memo,
+                    Cleared = this.Cleared
                 };
                 actionsToExecute.Add(action);
 

@@ -66,6 +66,7 @@
                      Text="{Binding Memo, Mode=TwoWay}"
                      Header="Memo"
                      />
+            <ToggleSwitch OnContent="Cleared" OffContent="Uncleared" IsOn="{Binding Cleared, Mode=TwoWay}" />
         </StackPanel>
 
         <CommandBar Grid.Row ="1">
