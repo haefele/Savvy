@@ -1595,7 +1595,7 @@
           "lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "YnabApi/0.11.2": {
+      "YnabApi/0.12.1": {
         "dependencies": {
           "Newtonsoft.Json": "[7.0.1, )"
         },
@@ -3290,7 +3290,7 @@
           "lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "YnabApi/0.11.2": {
+      "YnabApi/0.12.1": {
         "dependencies": {
           "Newtonsoft.Json": "[7.0.1, )"
         },
@@ -4957,7 +4957,7 @@
           "runtimes/win8-aot/lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "YnabApi/0.11.2": {
+      "YnabApi/0.12.1": {
         "dependencies": {
           "Newtonsoft.Json": "[7.0.1, )"
         },
@@ -6657,7 +6657,7 @@
           "lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "YnabApi/0.11.2": {
+      "YnabApi/0.12.1": {
         "dependencies": {
           "Newtonsoft.Json": "[7.0.1, )"
         },
@@ -8324,7 +8324,7 @@
           "runtimes/win8-aot/lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "YnabApi/0.11.2": {
+      "YnabApi/0.12.1": {
         "dependencies": {
           "Newtonsoft.Json": "[7.0.1, )"
         },
@@ -10024,7 +10024,7 @@
           "lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "YnabApi/0.11.2": {
+      "YnabApi/0.12.1": {
         "dependencies": {
           "Newtonsoft.Json": "[7.0.1, )"
         },
@@ -11691,7 +11691,7 @@
           "runtimes/win8-aot/lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "YnabApi/0.11.2": {
+      "YnabApi/0.12.1": {
         "dependencies": {
           "Newtonsoft.Json": "[7.0.1, )"
         },
@@ -15334,14 +15334,14 @@
         "[Content_Types].xml"
       ]
     },
-    "YnabApi/0.11.2": {
-      "sha512": "+LW4qXEHEDhtGc+mv2KszsVRoosB53EWosGURJGhqg9SDFo/Qfi4jQndystRDyfplmuzFQNZBqhfmSfTvBKS9g==",
+    "YnabApi/0.12.1": {
+      "sha512": "qEbTL/Q0ut9szbM/yGMQWpL6+UszoXLMxsK6il0/AAkVytZls98YSwW5k+ZdAvAk8hyQhv7ygnvIcCp9R8xKpw==",
       "type": "Package",
       "files": [
         "_rels/.rels",
         "YnabApi.nuspec",
         "lib/portable-net45+netcore45+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10/YnabApi.dll",
-        "package/services/metadata/core-properties/4218d3b462e8453791ed0608f273c980.psmdcp",
+        "package/services/metadata/core-properties/0a613f81693c4ade99a4150f6280dfef.psmdcp",
         "[Content_Types].xml"
       ]
     }
@@ -15352,7 +15352,7 @@
       "Microsoft.Net.Http >= 2.2.29",
       "Microsoft.NETCore.UniversalWindowsPlatform >= 5.0.0",
       "Newtonsoft.Json >= 7.0.1",
-      "YnabApi >= 0.11.2"
+      "YnabApi >= 0.12.1"
     ],
     "UAP,Version=v10.0": []
   }
