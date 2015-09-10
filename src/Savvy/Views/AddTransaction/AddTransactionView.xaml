@@ -4,7 +4,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Savvy.Views.AddTransaction"
-    xmlns:micro="using:Caliburn.Micro"
+    xmlns:caliburn="using:Caliburn.Micro"
     xmlns:converter="using:Savvy.Converter"
     
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -12,14 +12,7 @@
     mc:Ignorable="d"
     
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
-    
-    Language="en-US"
     >
-    <Page.Resources>
-        <converter:BooleanToObjectConverter x:Key="BoolToInflowOutflowConverter"
-                                            TrueValue="Outflow"
-                                            FalseValue="Inflow" />
-    </Page.Resources>
     <Grid>
 
         <Grid.RowDefinitions>
@@ -50,29 +43,32 @@
                             TextChanged="PayeesAutoSuggestBox_OnTextChanged"
                             />
 
-            <ToggleButton Content="{Binding IsOutflow, Converter={StaticResource BoolToInflowOutflowConverter}}" 
-                          Margin="0, 10, 0, 0"
-                          HorizontalAlignment="Stretch"
-                          IsChecked="{Binding IsOutflow, Mode=TwoWay}"
-                          />
-
             <TextBox x:Name="AmountTextBox"
                      Text="{Binding Amount, Mode=TwoWay}"
                      Header="Amount" 
                      InputScope="NumberFullWidth" 
                      />
+                
+            <ToggleSwitch OnContent="Outflow" 
+                          OffContent="Inflow" 
+                          IsOn="{Binding IsOutflow, Mode=TwoWay}"
+                          />
             
             <TextBox x:Name="MemoTextBox"
                      Text="{Binding Memo, Mode=TwoWay}"
                      Header="Memo"
                      />
-            <ToggleSwitch OnContent="Cleared" OffContent="Uncleared" IsOn="{Binding Cleared, Mode=TwoWay}" />
+            
+            <ToggleSwitch OnContent="Cleared" 
+                          OffContent="Uncleared" 
+                          IsOn="{Binding Cleared, Mode=TwoWay}" 
+                          />
         </StackPanel>
 
         <CommandBar Grid.Row ="1">
             <AppBarButton Icon="Save"
                           Label="Save transaction"
-                          micro:Message.Attach="Save"
+                          caliburn:Message.Attach="Save"
                           />
         </CommandBar>
         
