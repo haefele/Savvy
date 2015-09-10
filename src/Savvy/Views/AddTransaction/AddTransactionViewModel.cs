@@ -97,7 +97,7 @@ namespace Savvy.Views.AddTransaction
 
                 var fullKnowledgeDevice = await this._budget.GetFullKnowledgeDevice();
 
-                this.Payees.AddRange(await fullKnowledgeDevice.GetPayeesAsync());
+                this.Payees.AddRange(await fullKnowledgeDevice.GetActivePayeesAsync());
                 this.Accounts.AddRange(await fullKnowledgeDevice.GetAccountsAsync());
                 this.Categories.AddRange(await fullKnowledgeDevice.GetActiveCategoriesAsync());
             }
