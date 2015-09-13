@@ -33,6 +33,7 @@
             <ComboBox x:Name="CategoriesComboBox"
                       ItemsSource="{Binding Categories}" 
                       SelectedItem="{Binding SelectedCategory, Mode=TwoWay}"
+                      DisplayMemberPath="Name"
                       Header="Category"
                       HorizontalAlignment="Stretch"
                       />

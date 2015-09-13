@@ -23,32 +23,5 @@ namespace Savvy.Extensions
             var devices = await budget.GetRegisteredDevicesAsync();
             return devices.FirstOrDefault(f => f.DeviceGuid == deviceGuid);
         }
-
-        public static async Task<RegisteredDevice> GetFullKnowledgeDevice(this Budget budget)
-        {
-            var devices = await budget.GetRegisteredDevicesAsync();
-            return devices.FirstOrDefault(f => f.HasFullKnowledge);
-        }
-    }
-
-    public static class RegisteredDeviceExtensions
-    {
-        public static async Task<IList<Category>> GetActiveCategoriesAsync(this RegisteredDevice registeredDevice)
-        {
-            var categories = await registeredDevice.GetCategoriesAsync();
-            return categories.OnlyActive().ToList();
-        }
-
-        public static async Task<IList<Payee>> GetActivePayeesAsync(this RegisteredDevice registeredDevice)
-        {
-            var payees = await registeredDevice.GetPayeesAsync();
-            return payees.OnlyActive().ToList();
-        }
-
-        public static async Task<IList<Transaction>> GetActiveTransactionsAsync(this RegisteredDevice registeredDevice)
-        {
-            var transactions = await registeredDevice.GetTransactionsAsync();
-            return transactions.OnlyActive().ToList();
-        }
     }
 }

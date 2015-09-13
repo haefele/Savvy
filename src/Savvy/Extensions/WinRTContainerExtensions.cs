@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Windows.Storage;
 using Caliburn.Micro;
-using Savvy.Services.DropboxAuthentication;
 using Savvy.Services.SessionState;
 using Savvy.YnabApiFileSystem;
 using YnabApi;
@@ -18,7 +17,7 @@ namespace Savvy.Extensions
             var rootFolder = await ApplicationData.Current.LocalFolder.CreateFolderAsync("Dropbox", CreationCollisionOption.OpenIfExists);
             
             var fileSystem = new HybridFileSystem(rootFolder, sessionStateService);
-            var api = new YnabApi.YnabApi(new YnabApiSettings(fileSystem));
+            var api = new YnabApi.YnabApi(new YnabApiSettings(fileSystem, "Savvy", "Windows 10 Universal"));
 
             container.Instance(fileSystem);
             container.Instance(api);

@@ -10,6 +10,7 @@ using Savvy.Services.Loading;
 using Savvy.Views.BudgetOverview;
 using YnabApi;
 using YnabApi.DeviceActions;
+using YnabApi.Extensions;
 using YnabApi.Items;
 
 namespace Savvy.Views.AddTransaction
@@ -24,7 +25,7 @@ namespace Savvy.Views.AddTransaction
         private RegisteredDevice _device;
 
         private Account _selectedAccount;
-        private Category _selectedCategory;
+        private CategoryViewModel _selectedCategory;
         private string _selectedPayeeName;
         private bool _isOutflow;
         private string _amount;
@@ -42,8 +43,8 @@ namespace Savvy.Views.AddTransaction
             get { return this._selectedAccount; }
             set { this.SetProperty(ref this._selectedAccount, value); }
         }
-        public BindableCollection<Category> Categories { get; }
-        public Category SelectedCategory
+        public BindableCollection<CategoryViewModel> Categories { get; }
+        public CategoryViewModel SelectedCategory
         {
             get { return this._selectedCategory; }
             set { this.SetProperty(ref this._selectedCategory, value); }
@@ -83,7 +84,7 @@ namespace Savvy.Views.AddTransaction
 
             this.Payees = new BindableCollection<Payee>();
             this.Accounts = new BindableCollection<Account>();
-            this.Categories = new BindableCollection<Category>();
+            this.Categories = new BindableCollection<CategoryViewModel>();
 
             this.IsOutflow = true;
         }
@@ -94,12 +95,15 @@ namespace Savvy.Views.AddTransaction
             {
                 this._budget = await this._api.GetBudgetAsync(this.BudgetName);
                 this._device = await this._budget.GetRegisteredDevice(this.DeviceGuid);
+                
+                var payees = await this._device.GetPayeesAsync();
+                this.Payees.AddRange(payees.OnlyActive().WithoutTransfers());
 
-                var fullKnowledgeDevice = await this._budget.GetFullKnowledgeDevice();
+                var accounts = await this._device.GetAccountsAsync();
+                this.Accounts.AddRange(accounts);
 
-                this.Payees.AddRange(await fullKnowledgeDevice.GetActivePayeesAsync());
-                this.Accounts.AddRange(await fullKnowledgeDevice.GetAccountsAsync());
-                this.Categories.AddRange(await fullKnowledgeDevice.GetActiveCategoriesAsync());
+                var masterCategories = await this._device.GetCategoriesAsync();
+                this.Categories.AddRange(masterCategories.OnlyActive().SelectMany(f => f.SubCategories.OnlyActive().Select(d => new CategoryViewModel(f, d))));
             }
         }
 
@@ -128,7 +132,7 @@ namespace Savvy.Views.AddTransaction
                 var action = new CreateTransactionDeviceAction
                 {
                     Account = this.SelectedAccount,
-                    Category = this.SelectedCategory,
+                    Category = this.SelectedCategory.Category,
                     Payee = payee,
                     Amount = this.IsOutflow ? -1 * parsedAmount.Value : parsedAmount.Value,
                     Memo = this.Memo,
@@ -137,13 +141,15 @@ namespace Savvy.Views.AddTransaction
                 actionsToExecute.Add(action);
 
                 await this._device.ExecuteActions(actionsToExecute.ToArray());
-            }
 
-            this._navigationService
-                .For<BudgetOverviewViewModel>()
-                .WithParam(f => f.BudgetName, this.BudgetName)
-                .WithParam(f => f.DeviceGuid, this.DeviceGuid)
-                .Navigate();
+                this._device.ClearCache();
+
+                this._navigationService
+                    .For<BudgetOverviewViewModel>()
+                    .WithParam(f => f.BudgetName, this.BudgetName)
+                    .WithParam(f => f.DeviceGuid, this.DeviceGuid)
+                    .Navigate();
+            }
         }
     }
 }
