@@ -20,6 +20,7 @@ namespace Savvy.Views.AddTransaction
         private readonly YnabApi.YnabApi _api;
         private readonly INavigationService _navigationService;
         private readonly ILoadingService _loadingService;
+        private readonly IEventAggregator _eventAggregator;
 
         private Budget _budget;
         private RegisteredDevice _device;
@@ -76,11 +77,12 @@ namespace Savvy.Views.AddTransaction
             set { this.SetProperty(ref this._cleared, value); }
         }
 
-        public AddTransactionViewModel(YnabApi.YnabApi api, INavigationService navigationService, ILoadingService loadingService)
+        public AddTransactionViewModel(YnabApi.YnabApi api, INavigationService navigationService, ILoadingService loadingService, IEventAggregator eventAggregator)
         {
             this._api = api;
             this._navigationService = navigationService;
             this._loadingService = loadingService;
+            this._eventAggregator = eventAggregator;
 
             this.Payees = new BindableCollection<Payee>();
             this.Accounts = new BindableCollection<Account>();
@@ -141,7 +143,6 @@ namespace Savvy.Views.AddTransaction
                 actionsToExecute.Add(action);
 
                 await this._device.ExecuteActions(actionsToExecute.ToArray());
-
                 this._device.ClearCache();
 
                 this._navigationService

@@ -108,6 +108,11 @@
       <DependentUpon>AllBudgetsOverviewView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\AllBudgetsOverview\AllBudgetsOverviewViewModel.cs" />
+    <Compile Include="Views\AllTransactions\AllTransactionsView.xaml.cs">
+      <DependentUpon>AllTransactionsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\AllTransactions\AllTransactionsViewModel.cs" />
+    <Compile Include="Views\AllTransactions\TransactionsByMonth.cs" />
     <Compile Include="YnabApiFileSystem\AccessCodeMessageHandler.cs" />
     <Compile Include="YnabApiFileSystem\DropboxSynchronization.cs" />
     <Compile Include="YnabApiFileSystem\HybridFileSystem.cs" />
@@ -187,6 +192,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\AllBudgetsOverview\AllBudgetsOverviewView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\AllTransactions\AllTransactionsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

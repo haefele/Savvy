@@ -10,6 +10,7 @@ using Savvy.Services.Loading;
 using Savvy.Services.SessionState;
 using Savvy.Services.Settings;
 using Savvy.Views.AddTransaction;
+using Savvy.Views.AllTransactions;
 using Savvy.Views.Shell;
 using Savvy.Views.Shell.States;
 using Savvy.Views.Welcome;
@@ -45,7 +46,8 @@ namespace Savvy
             this._container
                 .Singleton<ShellViewModel>()
                 .PerRequest<WelcomeViewModel>()
-                .PerRequest<AddTransactionViewModel>();
+                .PerRequest<AddTransactionViewModel>()
+                .PerRequest<AllTransactionsViewModel>();
 
             //ShellStates
             this._container

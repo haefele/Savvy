@@ -8,6 +8,7 @@ using Savvy.Services.DropboxAuthentication;
 using Savvy.Services.Loading;
 using Savvy.Services.SessionState;
 using Savvy.Views.AddTransaction;
+using Savvy.Views.AllTransactions;
 using Savvy.Views.BudgetOverview;
 using Savvy.YnabApiFileSystem;
 using YnabApi;
@@ -22,6 +23,7 @@ namespace Savvy.Views.Shell.States
         private readonly ISessionStateService _sessionStateService;
 
         private readonly NavigationItemViewModel _overviewItem;
+        private readonly NavigationItemViewModel _transactionsItem;
         private readonly NavigationItemViewModel _addTransactionItem;
         private readonly NavigationItemViewModel _refreshItem;
 
@@ -29,7 +31,7 @@ namespace Savvy.Views.Shell.States
 
         private Budget _budget;
         private RegisteredDevice _device;
-        
+
         [Required]
         public string BudgetName { get; set; }
 
@@ -41,6 +43,7 @@ namespace Savvy.Views.Shell.States
             this._sessionStateService = sessionStateService;
 
             this._overviewItem = new NavigationItemViewModel(this.Overview) { Label = "Overview", Symbol = Symbol.Globe };
+            this._transactionsItem = new NavigationItemViewModel(this.Transactions) { Label = "Transactions", Symbol = Symbol.AllApps };
             this._addTransactionItem = new NavigationItemViewModel(this.AddTransaction) { Label = "Add transaction", Symbol = Symbol.Add };
             this._refreshItem = new NavigationItemViewModel(this.RefreshAsync) { Label = "Refresh", Symbol = Symbol.Refresh };
 
@@ -55,6 +58,7 @@ namespace Savvy.Views.Shell.States
             this._device = await this._budget.RegisterDevice(Windows.Networking.Proximity.PeerFinder.DisplayName);
 
             this.ViewModel.Actions.Add(this._overviewItem);
+            this.ViewModel.Actions.Add(this._transactionsItem);
             this.ViewModel.Actions.Add(this._addTransactionItem);
             this.ViewModel.Actions.Add(this._refreshItem);
 
@@ -68,6 +72,7 @@ namespace Savvy.Views.Shell.States
             this._container.UnregisterYnabApi();
 
             this.ViewModel.Actions.Remove(this._overviewItem);
+            this.ViewModel.Actions.Remove(this._transactionsItem);
             this.ViewModel.Actions.Remove(this._addTransactionItem);
             this.ViewModel.Actions.Remove(this._refreshItem);
             
@@ -78,6 +83,15 @@ namespace Savvy.Views.Shell.States
         {
             this._navigationService
                 .For<BudgetOverviewViewModel>()
+                .WithParam(f => f.BudgetName, this._budget.BudgetName)
+                .WithParam(f => f.DeviceGuid, this._device.DeviceGuid)
+                .Navigate();
+        }
+
+        private void Transactions()
+        {
+            this._navigationService
+                .For<AllTransactionsViewModel>()
                 .WithParam(f => f.BudgetName, this._budget.BudgetName)
                 .WithParam(f => f.DeviceGuid, this._device.DeviceGuid)
                 .Navigate();
