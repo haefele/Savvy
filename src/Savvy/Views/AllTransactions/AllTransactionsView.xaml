@@ -4,17 +4,28 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Savvy.Views.AllTransactions"
+    xmlns:converter="using:Savvy.Converter"
+    xmlns:items="using:YnabApi.Items"
     
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     >
+    
     <Page.Resources>
         <CollectionViewSource x:Key="GroupedTransactions" 
                               Source="{Binding Transactions}"
                               IsSourceGrouped="True"
                               ItemsPath="Transactions" />
+        <converter:ObjectToObjectConverter x:Key="TransactionStateToBooleanConverter">
+            <converter:MapItem Source="Cleared" Target="true" />
+            <converter:MapItem Source="Uncleared" Target="false" />
+            <converter:MapItem Source="Reconciled" Target="{x:Null}" />
+        </converter:ObjectToObjectConverter>
+        
+        <converter:DecimalToBrushConverter x:Key="DecimalToBrushConverter" />
     </Page.Resources>
+    
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <ListView ItemsSource="{Binding Source={StaticResource GroupedTransactions}}">
             <ListView.GroupStyle>
@@ -35,25 +46,29 @@
                 <DataTemplate>
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="40" />
+                            <ColumnDefinition Width="32" />
                             <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="40" />
+                            <ColumnDefinition Width="60" />
                         </Grid.ColumnDefinitions>
 
-                        <CheckBox IsChecked="True"
+                        <CheckBox IsChecked="{Binding State, Converter={StaticResource TransactionStateToBooleanConverter}}"
+                                  IsThreeState="True"
                                   Grid.Column="0"
                                   VerticalAlignment="Center"
-                                  Margin="0, 0, 5, 0"/>
+                                  Margin="0, 0, 0, 0"/>
 
                         <StackPanel Grid.Column="1">
-                            <TextBlock FontSize="12" Text="{Binding Category.Name}" />
-                            <TextBlock FontSize="10" Text="{Binding Payee.Name}" />
-                            <TextBlock FontSize="10" Text="{Binding Memo}" />
+                            <TextBlock FontSize="12" Text="{Binding Account.Name}" />
+                            <TextBlock FontSize="10" Text="{Binding Category.Name}" Margin="20, 0, 0, 0" />
+                            <TextBlock FontSize="10" Text="{Binding Payee.Name}" Margin="20, 0, 0, 0" />
+                            <TextBlock FontSize="10" Text="{Binding Memo}" Margin="20, 0, 0, 0" />
                         </StackPanel>
                         
                         <TextBlock Grid.Column="2" 
                                    Text="{Binding Amount}"
+                                   HorizontalAlignment="Right"
                                    VerticalAlignment="Center"
+                                   Foreground="{Binding Amount, Converter={StaticResource DecimalToBrushConverter}}"
                                    />
                         
                     </Grid>
