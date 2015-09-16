@@ -24,15 +24,29 @@
         </converter:ObjectToObjectConverter>
         
         <converter:DecimalToBrushConverter x:Key="DecimalToBrushConverter" />
+        
+        <converter:DecimalToStringWithTwoDecimalsConverter x:Key="DecimalToStringWithTwoDecimalsConverter" />
+        
+        <converter:FormatStringConverter x:Key="DateTimeToMonthNameConverter" FormatString="MMMM" />
+        
+        <converter:FormatStringConverter x:Key="DateTimeToYearConverter" FormatString="yyyy" />
     </Page.Resources>
     
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <ListView ItemsSource="{Binding Source={StaticResource GroupedTransactions}}">
             <ListView.GroupStyle>
                 <GroupStyle HidesIfEmpty="True">
+                    <GroupStyle.HeaderContainerStyle>
+                        <Style TargetType="ListViewHeaderItem">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        </Style>
+                    </GroupStyle.HeaderContainerStyle>
                     <GroupStyle.HeaderTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding YearAndMonth}" />
+                            <Grid>
+                                <TextBlock Text="{Binding YearAndMonth, Converter={StaticResource DateTimeToMonthNameConverter}}" />
+                                <TextBlock Text="{Binding YearAndMonth, Converter={StaticResource DateTimeToYearConverter}}" HorizontalAlignment="Right" />
+                            </Grid>
                         </DataTemplate>
                     </GroupStyle.HeaderTemplate>
                 </GroupStyle>
@@ -65,7 +79,7 @@
                         </StackPanel>
                         
                         <TextBlock Grid.Column="2" 
-                                   Text="{Binding Amount}"
+                                   Text="{Binding Amount, Converter={StaticResource DecimalToStringWithTwoDecimalsConverter}}"
                                    HorizontalAlignment="Right"
                                    VerticalAlignment="Center"
                                    Foreground="{Binding Amount, Converter={StaticResource DecimalToBrushConverter}}"

@@ -99,6 +99,8 @@
     </Compile>
     <Compile Include="Common\DisposableAction.cs" />
     <Compile Include="Converter\DecimalToBrushConverter.cs" />
+    <Compile Include="Converter\DecimalToStringWithTwoDecimalsConverter.cs" />
+    <Compile Include="Converter\FormatStringConverter.cs" />
     <Compile Include="Converter\ObjectToObjectConverter.cs" />
     <Compile Include="Extensions\StorageFolderExtensions.cs" />
     <Compile Include="Extensions\ZipArchiveExtensions.cs" />
