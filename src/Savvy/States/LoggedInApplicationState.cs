@@ -5,6 +5,7 @@ using Windows.UI.Xaml.Controls;
 using Caliburn.Micro;
 using Savvy.Extensions;
 using Savvy.Services.Loading;
+using Savvy.Services.Navigation;
 using Savvy.Services.SessionState;
 using Savvy.Views.AllBudgetsOverview;
 using Savvy.Views.Shell;
@@ -16,7 +17,7 @@ namespace Savvy.States
     public class LoggedInApplicationState : ApplicationState
     {
         private readonly WinRTContainer _container;
-        private readonly INavigationService _navigationService;
+        private readonly ISavvyNavigationService _navigationService;
         private readonly ILoadingService _loadingService;
         private readonly ISessionStateService _sessionStateService;
 
@@ -25,7 +26,7 @@ namespace Savvy.States
 
         private IList<NavigationItemViewModel> _budgetItems;
         
-        public LoggedInApplicationState(WinRTContainer container, INavigationService navigationService, ILoadingService loadingService, ISessionStateService sessionStateService)
+        public LoggedInApplicationState(WinRTContainer container, ISavvyNavigationService navigationService, ILoadingService loadingService, ISessionStateService sessionStateService)
         {
             this._container = container;
             this._navigationService = navigationService;
