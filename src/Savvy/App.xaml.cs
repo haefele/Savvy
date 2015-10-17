@@ -7,6 +7,7 @@ using Windows.UI.Xaml.Controls;
 using Caliburn.Micro;
 using Savvy.Services.DropboxAuthentication;
 using Savvy.Services.Loading;
+using Savvy.Services.Navigation;
 using Savvy.Services.SessionState;
 using Savvy.Services.Settings;
 using Savvy.Views.AddTransaction;
@@ -85,13 +86,13 @@ namespace Savvy
 
             this.Initialize();
 
-            var view = new ShellView();
-            this._container.RegisterNavigationService(view.ContentFrame);
-            this._container.Instance((ILoadingService)new LoadingService(view.LoadingOverlay));
-
             var stateService = this._container.GetInstance<ISessionStateService>();
             await stateService.RestoreStateAsync();
 
+            var view = new ShellView();
+            this._container.Instance((ISavvyNavigationService)new SavvyNavigationService(view.ContentFrame));
+            this._container.Instance((ILoadingService)new LoadingService(view.LoadingOverlay));
+            
             var viewModel = IoC.Get<ShellViewModel>();
             ViewModelBinder.Bind(viewModel, view, null);
 

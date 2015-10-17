@@ -7,6 +7,7 @@ using System.Windows.Input;
 using Windows.Security.Authentication.Web;
 using Windows.UI.Popups;
 using Caliburn.Micro;
+using Savvy.Services.Navigation;
 using Savvy.Services.SessionState;
 using Savvy.Services.Settings;
 using Savvy.Views.Shell.States;
@@ -15,7 +16,7 @@ namespace Savvy.Views.Shell
 {
     public class ShellViewModel : Screen
     {
-        private readonly INavigationService _navigationService;
+        private readonly ISavvyNavigationService _navigationService;
         private readonly ISessionStateService _sessionStateService;
 
         private ShellState _currentState;
@@ -34,12 +35,10 @@ namespace Savvy.Views.Shell
                 this._currentState.ViewModel = this;
 
                 this._currentState?.Enter();
-
-                this._navigationService.BackStack.Clear();
             }
         }
 
-        public ShellViewModel(INavigationService navigationService, ISessionStateService sessionStateService)
+        public ShellViewModel(ISavvyNavigationService navigationService, ISessionStateService sessionStateService)
         {
             this._navigationService = navigationService;
             this._sessionStateService = sessionStateService;

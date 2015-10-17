@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using Windows.Globalization.NumberFormatting;
 
 namespace Savvy.Extensions
 {
@@ -10,14 +11,8 @@ namespace Savvy.Extensions
             if (string.IsNullOrWhiteSpace(value))
                 return null;
 
-            value = value.Replace(',', '.');
-
-            decimal output;
-
-            if (decimal.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out output))
-                return output;
-
-            return null;
+            var decimalFormatter = new DecimalFormatter();
+            return (decimal?)decimalFormatter.ParseDouble(value);
         }
 
         public static string NormalizePath(this string value)

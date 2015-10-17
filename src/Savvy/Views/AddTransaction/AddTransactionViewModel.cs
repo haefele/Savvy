@@ -7,6 +7,7 @@ using Windows.Devices.Enumeration;
 using Caliburn.Micro;
 using Savvy.Extensions;
 using Savvy.Services.Loading;
+using Savvy.Services.Navigation;
 using Savvy.Views.BudgetOverview;
 using YnabApi;
 using YnabApi.DeviceActions;
@@ -18,7 +19,7 @@ namespace Savvy.Views.AddTransaction
     public class AddTransactionViewModel : Screen
     {
         private readonly YnabApi.YnabApi _api;
-        private readonly INavigationService _navigationService;
+        private readonly ISavvyNavigationService _navigationService;
         private readonly ILoadingService _loadingService;
         private readonly IEventAggregator _eventAggregator;
 
@@ -77,7 +78,7 @@ namespace Savvy.Views.AddTransaction
             set { this.SetProperty(ref this._cleared, value); }
         }
 
-        public AddTransactionViewModel(YnabApi.YnabApi api, INavigationService navigationService, ILoadingService loadingService, IEventAggregator eventAggregator)
+        public AddTransactionViewModel(YnabApi.YnabApi api, ISavvyNavigationService navigationService, ILoadingService loadingService, IEventAggregator eventAggregator)
         {
             this._api = api;
             this._navigationService = navigationService;
