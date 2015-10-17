@@ -1,24 +1,22 @@
-using System;
-using System.Diagnostics;
-using Windows.Storage;
 using Windows.UI.Xaml.Controls;
 using Caliburn.Micro;
 using Savvy.Services.DropboxAuthentication;
+using Savvy.Services.Navigation;
 using Savvy.Services.SessionState;
+using Savvy.Views.Shell;
 using Savvy.Views.Welcome;
-using Savvy.YnabApiFileSystem;
 
-namespace Savvy.Views.Shell.States
+namespace Savvy.States
 {
-    public class LoggedOutShellState : ShellState
+    public class LoggedOutApplicationState : ApplicationState
     {
-        private readonly INavigationService _navigationService;
+        private readonly ISavvyNavigationService _navigationService;
         private readonly IDropboxAuthenticationService _dropboxAuthenticationService;
         private readonly ISessionStateService _sessionStateService;
 
         private readonly NavigationItemViewModel _loginItem;
 
-        public LoggedOutShellState(INavigationService navigationService, IDropboxAuthenticationService dropboxAuthenticationService, ISessionStateService sessionStateService)
+        public LoggedOutApplicationState(ISavvyNavigationService navigationService, IDropboxAuthenticationService dropboxAuthenticationService, ISessionStateService sessionStateService)
         {
             this._navigationService = navigationService;
             this._dropboxAuthenticationService = dropboxAuthenticationService;
@@ -31,12 +29,12 @@ namespace Savvy.Views.Shell.States
         {
             this._navigationService.For<WelcomeViewModel>().Navigate();
 
-            this.ViewModel.Actions.Add(this._loginItem);
+            this.Application.Actions.Add(this._loginItem);
         }
 
         public override void Leave()
         {
-            this.ViewModel.Actions.Remove(this._loginItem);
+            this.Application.Actions.Remove(this._loginItem);
         }
 
         private async void Login()
@@ -48,8 +46,8 @@ namespace Savvy.Views.Shell.States
 
             this._sessionStateService.DropboxUserId = auth.UserId;
             this._sessionStateService.DropboxAccessCode = auth.AccessCode;
-            
-            this.ViewModel.CurrentState = IoC.Get<LoggedInShellState>();
+
+            this.Application.CurrentState = IoC.Get<LoggedInApplicationState>();
         }
     }
 }

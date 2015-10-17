@@ -10,10 +10,10 @@ using Savvy.Services.Loading;
 using Savvy.Services.Navigation;
 using Savvy.Services.SessionState;
 using Savvy.Services.Settings;
+using Savvy.States;
 using Savvy.Views.AddTransaction;
 using Savvy.Views.AllTransactions;
 using Savvy.Views.Shell;
-using Savvy.Views.Shell.States;
 using Savvy.Views.Welcome;
 
 namespace Savvy
@@ -52,9 +52,9 @@ namespace Savvy
 
             //ShellStates
             this._container
-                .PerRequest<LoggedOutShellState>()
-                .PerRequest<LoggedInShellState>()
-                .PerRequest<OpenBudgetShellState>();
+                .PerRequest<LoggedOutApplicationState>()
+                .PerRequest<LoggedInApplicationState>()
+                .PerRequest<OpenBudgetApplicationState>();
 
             //Services
             this._container

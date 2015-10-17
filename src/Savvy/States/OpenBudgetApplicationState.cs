@@ -1,24 +1,23 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 using Windows.UI.Xaml.Controls;
 using Caliburn.Micro;
 using Savvy.Extensions;
-using Savvy.Services.DropboxAuthentication;
 using Savvy.Services.Loading;
+using Savvy.Services.Navigation;
 using Savvy.Services.SessionState;
 using Savvy.Views.AddTransaction;
 using Savvy.Views.AllTransactions;
 using Savvy.Views.BudgetOverview;
+using Savvy.Views.Shell;
 using Savvy.YnabApiFileSystem;
 using YnabApi;
 
-namespace Savvy.Views.Shell.States
+namespace Savvy.States
 {
-    public class OpenBudgetShellState : ShellState
+    public class OpenBudgetApplicationState : ApplicationState
     {
         private readonly WinRTContainer _container;
-        private readonly INavigationService _navigationService;
+        private readonly ISavvyNavigationService _navigationService;
         private readonly ILoadingService _loadingService;
         private readonly ISessionStateService _sessionStateService;
 
@@ -35,7 +34,7 @@ namespace Savvy.Views.Shell.States
         [Required]
         public string BudgetName { get; set; }
 
-        public OpenBudgetShellState(WinRTContainer container, INavigationService navigationService, ILoadingService loadingService, ISessionStateService sessionStateService)
+        public OpenBudgetApplicationState(WinRTContainer container, ISavvyNavigationService navigationService, ILoadingService loadingService, ISessionStateService sessionStateService)
         {
             this._container = container;
             this._navigationService = navigationService;
@@ -57,12 +56,12 @@ namespace Savvy.Views.Shell.States
             this._budget = await api.GetBudgetAsync(this.BudgetName);
             this._device = await this._budget.RegisterDevice(Windows.Networking.Proximity.PeerFinder.DisplayName);
 
-            this.ViewModel.Actions.Add(this._overviewItem);
-            this.ViewModel.Actions.Add(this._transactionsItem);
-            this.ViewModel.Actions.Add(this._addTransactionItem);
-            this.ViewModel.Actions.Add(this._refreshItem);
+            this.Application.Actions.Add(this._overviewItem);
+            this.Application.Actions.Add(this._transactionsItem);
+            this.Application.Actions.Add(this._addTransactionItem);
+            this.Application.Actions.Add(this._refreshItem);
 
-            this.ViewModel.SecondaryActions.Add(this._changeBudgetItem);
+            this.Application.SecondaryActions.Add(this._changeBudgetItem);
 
             this.Overview();
         }
@@ -71,12 +70,12 @@ namespace Savvy.Views.Shell.States
         {
             this._container.UnregisterYnabApi();
 
-            this.ViewModel.Actions.Remove(this._overviewItem);
-            this.ViewModel.Actions.Remove(this._transactionsItem);
-            this.ViewModel.Actions.Remove(this._addTransactionItem);
-            this.ViewModel.Actions.Remove(this._refreshItem);
+            this.Application.Actions.Remove(this._overviewItem);
+            this.Application.Actions.Remove(this._transactionsItem);
+            this.Application.Actions.Remove(this._addTransactionItem);
+            this.Application.Actions.Remove(this._refreshItem);
             
-            this.ViewModel.SecondaryActions.Remove(this._changeBudgetItem);
+            this.Application.SecondaryActions.Remove(this._changeBudgetItem);
         }
 
         private void Overview()
@@ -118,7 +117,7 @@ namespace Savvy.Views.Shell.States
         private void ChangeBudget()
         {
             this._sessionStateService.BudgetName = null;
-            this.ViewModel.CurrentState = IoC.Get<LoggedInShellState>();
+            this.Application.CurrentState = IoC.Get<LoggedInApplicationState>();
         }
     }
 }

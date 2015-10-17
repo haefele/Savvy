@@ -1,21 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.UI.Xaml.Controls;
 using Caliburn.Micro;
 using Savvy.Extensions;
-using Savvy.Services.DropboxAuthentication;
 using Savvy.Services.Loading;
 using Savvy.Services.SessionState;
 using Savvy.Views.AllBudgetsOverview;
+using Savvy.Views.Shell;
 using Savvy.YnabApiFileSystem;
 using YnabApi;
 
-namespace Savvy.Views.Shell.States
+namespace Savvy.States
 {
-    public class LoggedInShellState : ShellState
+    public class LoggedInApplicationState : ApplicationState
     {
         private readonly WinRTContainer _container;
         private readonly INavigationService _navigationService;
@@ -27,7 +25,7 @@ namespace Savvy.Views.Shell.States
 
         private IList<NavigationItemViewModel> _budgetItems;
         
-        public LoggedInShellState(WinRTContainer container, INavigationService navigationService, ILoadingService loadingService, ISessionStateService sessionStateService)
+        public LoggedInApplicationState(WinRTContainer container, INavigationService navigationService, ILoadingService loadingService, ISessionStateService sessionStateService)
         {
             this._container = container;
             this._navigationService = navigationService;
@@ -69,35 +67,35 @@ namespace Savvy.Views.Shell.States
 
         private void AddActions(IList<Budget> budgets)
         {
-            this.ViewModel.SecondaryActions.Add(this._logoutItem);
+            this.Application.SecondaryActions.Add(this._logoutItem);
 
             this._budgetItems = budgets
                 .Select(f => new NavigationItemViewModel(() => this.OpenBudget(f)) { Label = f.BudgetName, Symbol = Symbol.Folder })
                 .ToList();
 
-            this.ViewModel.Actions.AddRange(this._budgetItems);
-            this.ViewModel.Actions.Add(this._refreshItem);
+            this.Application.Actions.AddRange(this._budgetItems);
+            this.Application.Actions.Add(this._refreshItem);
         }
 
         private void RemoveActions()
         {
-            this.ViewModel.SecondaryActions.Remove(this._logoutItem);
+            this.Application.SecondaryActions.Remove(this._logoutItem);
             
             foreach (var budgetItem in this._budgetItems ?? new List<NavigationItemViewModel>())
             {
-                this.ViewModel.Actions.Remove(budgetItem);
+                this.Application.Actions.Remove(budgetItem);
             }
-            this.ViewModel.Actions.Remove(this._refreshItem);
+            this.Application.Actions.Remove(this._refreshItem);
         }
         
         private void OpenBudget(Budget budget)
         {
             this._sessionStateService.BudgetName = budget.BudgetName;
 
-            var newState = IoC.Get<OpenBudgetShellState>();
+            var newState = IoC.Get<OpenBudgetApplicationState>();
             newState.BudgetName = budget.BudgetName;
 
-            this.ViewModel.CurrentState = newState;
+            this.Application.CurrentState = newState;
         }
 
         private async Task RefreshAsync()
@@ -121,7 +119,7 @@ namespace Savvy.Views.Shell.States
             this._sessionStateService.DropboxAccessCode = null;
             this._sessionStateService.DropboxUserId = null;
 
-            this.ViewModel.CurrentState = IoC.Get<LoggedOutShellState>();
+            this.Application.CurrentState = IoC.Get<LoggedOutApplicationState>();
         }
     }
 }

@@ -10,21 +10,21 @@ using Caliburn.Micro;
 using Savvy.Services.Navigation;
 using Savvy.Services.SessionState;
 using Savvy.Services.Settings;
-using Savvy.Views.Shell.States;
+using Savvy.States;
 
 namespace Savvy.Views.Shell
 {
-    public class ShellViewModel : Screen
+    public class ShellViewModel : Screen, IApplication
     {
         private readonly ISavvyNavigationService _navigationService;
         private readonly ISessionStateService _sessionStateService;
 
-        private ShellState _currentState;
+        private ApplicationState _currentState;
 
         public BindableCollection<NavigationItemViewModel> Actions { get; }
         public BindableCollection<NavigationItemViewModel> SecondaryActions { get; }
 
-        public ShellState CurrentState
+        public ApplicationState CurrentState
         {
             get { return this._currentState; }
             set
@@ -32,7 +32,7 @@ namespace Savvy.Views.Shell
                 this._currentState?.Leave();
 
                 this._currentState = value;
-                this._currentState.ViewModel = this;
+                this._currentState.Application = this;
 
                 this._currentState?.Enter();
             }
@@ -50,23 +50,23 @@ namespace Savvy.Views.Shell
         protected override void OnActivate()
         {
             if (this._sessionStateService.DropboxAccessCode != null &&
-                this._sessionStateService.DropboxUserId != null)
+                   this._sessionStateService.DropboxUserId != null)
             {
                 if (this._sessionStateService.BudgetName != null)
                 {
-                    var newShellState = IoC.Get<OpenBudgetShellState>();
+                    var newShellState = IoC.Get<OpenBudgetApplicationState>();
                     newShellState.BudgetName = this._sessionStateService.BudgetName;
 
                     this.CurrentState = newShellState;
                 }
                 else
                 {
-                    this.CurrentState = IoC.Get<LoggedInShellState>();
+                    this.CurrentState = IoC.Get<LoggedInApplicationState>();
                 }
             }
             else
             {
-                this.CurrentState = IoC.Get<LoggedOutShellState>();
+                this.CurrentState = IoC.Get<LoggedOutApplicationState>();
             }
         }
     }

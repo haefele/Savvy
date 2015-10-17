@@ -109,6 +109,7 @@
     <Compile Include="Services\Navigation\SavvyNavigationService.cs" />
     <Compile Include="Services\SessionState\ISessionStateService.cs" />
     <Compile Include="Services\SessionState\SessionStateService.cs" />
+    <Compile Include="States\IApplication.cs" />
     <Compile Include="Views\AddTransaction\CategoryViewModel.cs" />
     <Compile Include="Views\AllBudgetsOverview\AllBudgetsOverviewView.xaml.cs">
       <DependentUpon>AllBudgetsOverviewView.xaml</DependentUpon>
@@ -148,11 +149,11 @@
       <DependentUpon>BudgetOverviewView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\BudgetOverview\BudgetOverviewViewModel.cs" />
-    <Compile Include="Views\Shell\States\LoggedInShellState.cs" />
-    <Compile Include="Views\Shell\States\LoggedOutShellState.cs" />
+    <Compile Include="States\LoggedInApplicationState.cs" />
+    <Compile Include="States\LoggedOutApplicationState.cs" />
     <Compile Include="Views\Shell\NavigationItemViewModel.cs" />
-    <Compile Include="Views\Shell\States\OpenBudgetShellState.cs" />
-    <Compile Include="Views\Shell\States\ShellState.cs" />
+    <Compile Include="States\OpenBudgetApplicationState.cs" />
+    <Compile Include="States\ApplicationState.cs" />
     <Compile Include="Views\Shell\ShellView.xaml.cs">
       <DependentUpon>ShellView.xaml</DependentUpon>
     </Compile>
@@ -218,7 +219,9 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Views\Shell\States\" />
+  </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>
