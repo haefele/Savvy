@@ -1,15 +1,6 @@
-﻿using System;
-using System.IO;
-using System.IO.Compression;
-using System.Linq;
-using System.Text;
-using System.Windows.Input;
-using Windows.Security.Authentication.Web;
-using Windows.UI.Popups;
-using Caliburn.Micro;
+﻿using Caliburn.Micro;
 using Savvy.Services.Navigation;
 using Savvy.Services.SessionState;
-using Savvy.Services.Settings;
 using Savvy.States;
 
 namespace Savvy.Views.Shell
@@ -35,6 +26,8 @@ namespace Savvy.Views.Shell
                 this._currentState.Application = this;
 
                 this._currentState?.Enter();
+
+                this._navigationService.ClearBackStack();
             }
         }
 
@@ -45,29 +38,6 @@ namespace Savvy.Views.Shell
 
             this.Actions = new BindableCollection<NavigationItemViewModel>();
             this.SecondaryActions = new BindableCollection<NavigationItemViewModel>();
-        }
-        
-        protected override void OnActivate()
-        {
-            if (this._sessionStateService.DropboxAccessCode != null &&
-                   this._sessionStateService.DropboxUserId != null)
-            {
-                if (this._sessionStateService.BudgetName != null)
-                {
-                    var newShellState = IoC.Get<OpenBudgetApplicationState>();
-                    newShellState.BudgetName = this._sessionStateService.BudgetName;
-
-                    this.CurrentState = newShellState;
-                }
-                else
-                {
-                    this.CurrentState = IoC.Get<LoggedInApplicationState>();
-                }
-            }
-            else
-            {
-                this.CurrentState = IoC.Get<LoggedOutApplicationState>();
-            }
         }
     }
 }

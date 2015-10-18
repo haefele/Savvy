@@ -8,6 +8,7 @@ namespace Savvy.Services.SessionState
         public string DropboxUserId { get; set; }
         public string DropboxAccessCode { get; set; }
         public string BudgetName { get; set; }
+        public string DeviceGuid { get; set; }
 
         public Task SaveStateAsync()
         {
@@ -32,6 +33,9 @@ namespace Savvy.Services.SessionState
 
             if (container.Values.ContainsKey(nameof(this.BudgetName)))
                 this.BudgetName = (string)container.Values[nameof(this.BudgetName)];
+
+            if (container.Values.ContainsKey(nameof(this.DeviceGuid)))
+                this.DeviceGuid = (string)container.Values[nameof(this.DeviceGuid)];
 
             return Task.CompletedTask;
         }

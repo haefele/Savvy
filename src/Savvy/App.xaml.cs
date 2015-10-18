@@ -96,6 +96,8 @@ namespace Savvy
             var viewModel = IoC.Get<ShellViewModel>();
             ViewModelBinder.Bind(viewModel, view, null);
 
+            this.RestoreApplicationState(stateService, viewModel);
+
             ScreenExtensions.TryActivate(viewModel);
 
             Window.Current.Content = view;
@@ -114,10 +116,29 @@ namespace Savvy
 
         protected override async void OnUnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            var dialog = new ContentDialog();
-            dialog.Title = e.Exception.Message;
+        }
+        
+        private void RestoreApplicationState(ISessionStateService sessionStateService, ShellViewModel shell)
+        {
+            if (sessionStateService.DropboxAccessCode != null &&
+                sessionStateService.DropboxUserId != null)
+            {
+                if (sessionStateService.BudgetName != null)
+                {
+                    var newShellState = IoC.Get<OpenBudgetApplicationState>();
+                    newShellState.BudgetName = sessionStateService.BudgetName;
 
-            await dialog.ShowAsync();
+                    shell.CurrentState = newShellState;
+                }
+                else
+                {
+                    shell.CurrentState = IoC.Get<LoggedInApplicationState>();
+                }
+            }
+            else
+            {
+                shell.CurrentState = IoC.Get<LoggedOutApplicationState>();
+            }
         }
     }
 }

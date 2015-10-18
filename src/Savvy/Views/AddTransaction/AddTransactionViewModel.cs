@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Linq;
+using System.ServiceModel.Channels;
 using Windows.Devices.Enumeration;
 using Caliburn.Micro;
 using Savvy.Extensions;
 using Savvy.Services.Loading;
 using Savvy.Services.Navigation;
+using Savvy.Services.SessionState;
 using Savvy.Views.BudgetOverview;
 using YnabApi;
 using YnabApi.DeviceActions;
@@ -21,7 +23,7 @@ namespace Savvy.Views.AddTransaction
         private readonly YnabApi.YnabApi _api;
         private readonly ISavvyNavigationService _navigationService;
         private readonly ILoadingService _loadingService;
-        private readonly IEventAggregator _eventAggregator;
+        private readonly ISessionStateService _sessionStateService;
 
         private Budget _budget;
         private RegisteredDevice _device;
@@ -33,12 +35,7 @@ namespace Savvy.Views.AddTransaction
         private string _amount;
         private string _memo;
         private bool _cleared;
-
-        [Required]
-        public string BudgetName { get; set; }
-        [Required]
-        public string DeviceGuid { get; set; }
-
+        
         public BindableCollection<Account> Accounts { get; }
         public Account SelectedAccount
         {
@@ -78,12 +75,12 @@ namespace Savvy.Views.AddTransaction
             set { this.SetProperty(ref this._cleared, value); }
         }
 
-        public AddTransactionViewModel(YnabApi.YnabApi api, ISavvyNavigationService navigationService, ILoadingService loadingService, IEventAggregator eventAggregator)
+        public AddTransactionViewModel(YnabApi.YnabApi api, ISavvyNavigationService navigationService, ILoadingService loadingService, ISessionStateService sessionStateService)
         {
             this._api = api;
             this._navigationService = navigationService;
             this._loadingService = loadingService;
-            this._eventAggregator = eventAggregator;
+            this._sessionStateService = sessionStateService;
 
             this.Payees = new BindableCollection<Payee>();
             this.Accounts = new BindableCollection<Account>();
@@ -96,8 +93,8 @@ namespace Savvy.Views.AddTransaction
         {
             using (this._loadingService.Show("Loading data..."))
             {
-                this._budget = await this._api.GetBudgetAsync(this.BudgetName);
-                this._device = await this._budget.GetRegisteredDevice(this.DeviceGuid);
+                this._budget = await this._api.GetBudgetAsync(this._sessionStateService.BudgetName);
+                this._device = await this._budget.GetRegisteredDevice(this._sessionStateService.DeviceGuid);
                 
                 var payees = await this._device.GetPayeesAsync();
                 this.Payees.AddRange(payees.OnlyActive().WithoutTransfers());
@@ -148,8 +145,6 @@ namespace Savvy.Views.AddTransaction
 
                 this._navigationService
                     .For<BudgetOverviewViewModel>()
-                    .WithParam(f => f.BudgetName, this.BudgetName)
-                    .WithParam(f => f.DeviceGuid, this.DeviceGuid)
                     .Navigate();
             }
         }

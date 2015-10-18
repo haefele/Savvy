@@ -7,6 +7,7 @@ namespace Savvy.Services.SessionState
         string DropboxUserId { get; set; }
         string DropboxAccessCode { get; set; }
         string BudgetName { get; set; }
+        string DeviceGuid { get; set; }
 
         Task SaveStateAsync();
         Task RestoreStateAsync();

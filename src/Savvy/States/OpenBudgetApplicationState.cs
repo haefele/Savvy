@@ -82,8 +82,6 @@ namespace Savvy.States
         {
             this._navigationService
                 .For<BudgetOverviewViewModel>()
-                .WithParam(f => f.BudgetName, this._budget.BudgetName)
-                .WithParam(f => f.DeviceGuid, this._device.DeviceGuid)
                 .Navigate();
         }
 
@@ -91,8 +89,6 @@ namespace Savvy.States
         {
             this._navigationService
                 .For<AllTransactionsViewModel>()
-                .WithParam(f => f.BudgetName, this._budget.BudgetName)
-                .WithParam(f => f.DeviceGuid, this._device.DeviceGuid)
                 .Navigate();
         }
 
@@ -100,8 +96,6 @@ namespace Savvy.States
         {
             this._navigationService
                 .For<AddTransactionViewModel>()
-                .WithParam(f => f.BudgetName, this._budget.BudgetName)
-                .WithParam(f => f.DeviceGuid, this._device.DeviceGuid)
                 .Navigate();
         }
         
