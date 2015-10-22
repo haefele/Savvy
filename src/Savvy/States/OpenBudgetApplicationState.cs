@@ -56,6 +56,8 @@ namespace Savvy.States
             this._budget = await api.GetBudgetAsync(this.BudgetName);
             this._device = await this._budget.RegisterDevice(Windows.Networking.Proximity.PeerFinder.DisplayName);
 
+            this._sessionStateService.DeviceGuid = this._device.DeviceGuid;
+
             this.Application.Actions.Add(this._overviewItem);
             this.Application.Actions.Add(this._transactionsItem);
             this.Application.Actions.Add(this._addTransactionItem);
@@ -69,6 +71,8 @@ namespace Savvy.States
         public override void Leave()
         {
             this._container.UnregisterYnabApi();
+
+            this._sessionStateService.DeviceGuid = null;
 
             this.Application.Actions.Remove(this._overviewItem);
             this.Application.Actions.Remove(this._transactionsItem);
